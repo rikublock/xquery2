@@ -60,4 +60,5 @@ ENV/
 # Jetbrains
 .idea
 
+tmp/
 

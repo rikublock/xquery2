@@ -1,0 +1,16 @@
+version: "3.9"
+services:
+
+  # hasura
+  xquery-graphql:
+    image: hasura/graphql-engine:v2.8.4
+    container_name: "${PROJECT_NAME}-hasura"
+    restart: unless-stopped
+    tty: true
+    network_mode: "host"
+#    ports:
+#      - "8080:8080"
+    environment:
+      HASURA_GRAPHQL_DATABASE_URL: postgres://${DB_USERNAME}:${DB_PASSWORD}@localhost:5432/${DB_DATABASE}
+      HASURA_GRAPHQL_ENABLE_CONSOLE: "true"
+      HASURA_GRAPHQL_DEV_MODE: "true"

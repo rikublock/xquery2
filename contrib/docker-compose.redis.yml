@@ -1,0 +1,22 @@
+version: "3.9"
+services:
+
+  # redis
+  xquery-redis:
+    image: redis:6
+    container_name: "${PROJECT_NAME}-redis"
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "6379:6379"
+    command: redis-server --save 20 1 --loglevel warning --requirepass "${REDIS_PASSWORD}"
+#    volumes:
+#      - cache:/data
+
+#volumes:
+#  cache:
+#    driver: local
+
+
+
+
