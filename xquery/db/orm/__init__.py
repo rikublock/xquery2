@@ -7,5 +7,7 @@
 # This file is part of XQuery2.
 
 from .base import *
+from .chain import *
+from .exchange import *
 from .query import *
 from .state import *

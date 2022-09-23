@@ -37,6 +37,12 @@ class Info(object):
         return f"Info <address={self.address} from_block={self.from_block}>"
 
 
+rc20_bytes = Info(
+    address=None,
+    abi_file="xquery/contract/RC20_bytes.json",
+    from_block=None,
+)
+
 png_pair = Info(
     address=None,
     abi_file="xquery/contract/png_Pair.json",
@@ -61,8 +67,68 @@ png_router = Info(
     from_block=56879,
 )
 
-png_wavax = Info(
+wavax = Info(
     address="0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7",
-    abi_file="xquery/contract/png_WAVAX.json",
+    abi_file="xquery/contract/WAVAX.json",
     from_block=820,
+)
+
+psys_pair = Info(
+    address=None,
+    abi_file="xquery/contract/psys_Pair.json",
+    from_block=None,
+)
+
+psys_rc20 = Info(
+    address=None,
+    abi_file="xquery/contract/psys_RC20.json",
+    from_block=None,
+)
+
+psys_factory = Info(
+    address="0x7Bbbb6abaD521dE677aBe089C85b29e3b2021496",
+    abi_file="xquery/contract/psys_Factory.json",
+    from_block=38185,
+)
+
+psys_router = Info(
+    address="0x017dAd2578372CAEE5c6CddfE35eEDB3728544C4",
+    abi_file="xquery/contract/psys_Router.json",
+    from_block=38190,
+)
+
+wsys = Info(
+    address="0xd3e822f3ef011Ca5f17D82C956D952D8d7C3A1BB",
+    abi_file="xquery/contract/WSYS.json",
+    from_block=1523,
+)
+
+uni_v2_pair = Info(
+    address=None,
+    abi_file="xquery/contract/uni_v2_Pair.json",
+    from_block=None,
+)
+
+uni_v2_rc20 = Info(
+    address=None,
+    abi_file="xquery/contract/uni_v2_RC20.json",
+    from_block=None,
+)
+
+uni_v2_factory = Info(
+    address="0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f",
+    abi_file="xquery/contract/uni_v2_Factory.json",
+    from_block=10000835,
+)
+
+uni_v2_router = Info(
+    address="0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
+    abi_file="xquery/contract/uni_v2_Router.json",
+    from_block=10207858,
+)
+
+weth = Info(
+    address="0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    abi_file="xquery/contract/WETH9.json",
+    from_block=4719568,
 )

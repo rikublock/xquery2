@@ -28,7 +28,7 @@ import xquery.cache
 import xquery.contract
 import xquery.db.orm as orm
 from xquery.types import ExtendedLogReceipt
-from xquery.util.misc import compute_xhash
+from xquery.util import compute_xhash
 from .indexer import EventIndexer
 
 log = logging.getLogger(__name__)
@@ -36,7 +36,7 @@ log = logging.getLogger(__name__)
 
 class EventIndexerBase(EventIndexer):
 
-    def __init__(self, w3: Web3, cache: xquery.cache.Cache, chain: orm.Chains = None) -> None:
+    def __init__(self, w3: Web3, cache: xquery.cache.Cache, chain: orm.Chain = None) -> None:
         self.w3 = w3
         self._cache = cache
         self._chain = chain
@@ -97,9 +97,9 @@ class EventIndexerBase(EventIndexer):
         return result
 
 
-class EventIndexer_Router(EventIndexerBase):
+class EventIndexerRouter(EventIndexerBase):
 
-    def __init__(self, w3: Web3, cache: xquery.cache.Cache, chain: orm.Chains, abi_rc20: ABI, abi_pair: ABI, abis: List[ABI]) -> None:
+    def __init__(self, w3: Web3, cache: xquery.cache.Cache, chain: orm.Chain, abi_rc20: ABI, abi_pair: ABI, abis: List[ABI]) -> None:
         """
         Deprecated indexer used only in classic XQuery.
 
@@ -181,8 +181,8 @@ class EventIndexer_Router(EventIndexerBase):
                 return None
 
             token = {
-                "name": name,
-                "symbol": symbol,
+                "name": str(name)[:64],
+                "symbol": str(symbol)[:16],
                 "decimals": int(decimals),
             }
 
@@ -325,7 +325,7 @@ class EventIndexer_Router(EventIndexerBase):
 
         return result
 
-    def process(self, entry: ExtendedLogReceipt) -> Dict[str, Any]:
+    def process(self, entry: ExtendedLogReceipt) -> List[orm.BaseModel]:
         """
         Process remaining event information required for any XQuery, namely:
 
@@ -375,25 +375,28 @@ class EventIndexer_Router(EventIndexerBase):
         # process event data (args)
         result.update(self._process_args(entry))
 
-        return result
+        return [orm.XQuery(**result)]
 
 
-class EventIndexer_Pangolin(EventIndexer_Router):
+class EventIndexerRouterPangolin(EventIndexerRouter):
 
-    def __init__(self, w3: Web3, cache: xquery.cache.Cache):
+    def __init__(self, w3: Web3, db: xquery.db.FusionSQL, cache: xquery.cache.Cache):
         """
         Indexer for the Pangolin Exchange
         """
+        # TODO
+        # assert w3.eth.chain_id == int(orm.Chain.AVAX)
+
         super().__init__(
             w3=w3,
             cache=cache,
-            chain=orm.Chains.AVAX,
+            chain=orm.Chain.AVAX,
             abi_rc20=xquery.contract.png_rc20.abi,
             abi_pair=xquery.contract.png_pair.abi,
             abis=[
                 xquery.contract.png_router.abi,
                 xquery.contract.png_pair.abi,
                 xquery.contract.png_rc20.abi,
-                xquery.contract.png_wavax.abi,
+                xquery.contract.wavax.abi,
             ],
         )

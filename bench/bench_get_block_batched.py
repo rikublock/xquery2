@@ -14,8 +14,8 @@ from web3 import Web3
 from web3.middleware import geth_poa_middleware
 from web3.types import RPCEndpoint
 
-import xquery.provider
 from xquery.config import CONFIG as C
+from xquery.provider import BatchHTTPProvider
 from xquery.util.misc import timeit
 
 log = logging.getLogger(__name__)
@@ -26,12 +26,10 @@ log = logging.getLogger(__name__)
 
 @timeit
 def bench_get_block_batched(from_block: int = 1600000, num: int = 20) -> int:
-    logging.basicConfig(level=logging.DEBUG, format=C["LOG_FORMAT"], datefmt=C["LOG_DATE_FORMAT"])
-
-    api_url = C["API_URL"]["AVAX"]
+    logging.basicConfig(level=C["LOG_LEVEL"], format=C["LOG_FORMAT"], datefmt=C["LOG_DATE_FORMAT"])
 
     try:
-        w3 = Web3(xquery.provider.BatchHTTPProvider(api_url))
+        w3 = Web3(BatchHTTPProvider(endpoint_uri=C["API_URL"]))
         w3.middleware_onion.inject(geth_poa_middleware, layer=0)
     except Exception as e:
         log.error(e)
@@ -41,7 +39,7 @@ def bench_get_block_batched(from_block: int = 1600000, num: int = 20) -> int:
     def get_block_batched(full_transactions: bool = False):
         calls = []
         for i in range(num):
-            c = xquery.provider.BatchHTTPProvider.build_entry(
+            c = BatchHTTPProvider.build_entry(
                 method=RPCEndpoint("eth_getBlockByNumber"),
                 params=[hex(from_block + i), full_transactions],
                 request_id=i,

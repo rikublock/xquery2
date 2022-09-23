@@ -27,8 +27,8 @@ class IndexerState(BaseModel, Base):
     """
     __tablename__ = "indexer_state"
 
-    contract_address = Column(String(length=66), nullable=False)
-    block_height = Column(Integer, nullable=False)
+    name = Column(String(length=128), unique=True, nullable=False)
+    block_number = Column(Integer, nullable=False)
     block_hash = Column(String(length=66))
     discarded = Column(Boolean)
 
@@ -41,5 +41,7 @@ class ProcessorState(BaseModel, Base):
     """
     __tablename__ = "processor_state"
 
-    block_height = Column(Integer, nullable=False)
+    name = Column(String(length=128), unique=True, nullable=False)
+    stage = Column(Integer, unique=True, nullable=False)
+    block_number = Column(Integer, nullable=False)
     block_hash = Column(String(length=66))

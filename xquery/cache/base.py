@@ -14,8 +14,6 @@ from typing import (
 
 import abc
 import logging
-import pickle
-import redis
 
 log = logging.getLogger(__name__)
 
@@ -88,6 +86,9 @@ class Cache_Dummy(Cache):
     Dummy cache service that does nothing
     """
 
+    def __init__(self, *args, **kwargs) -> None:
+        pass
+
     def set(self, name: TKey, value: TValue, ttl: Optional[int] = None) -> Any:
         return True
 
@@ -102,67 +103,3 @@ class Cache_Dummy(Cache):
 
     def flush(self) -> Any:
         return True
-
-
-class Cache_Memory(Cache):
-    """
-    Simple in-memory cache service
-    """
-
-    def __init__(self):
-        self._cache = {}
-
-    def set(self, name: TKey, value: TValue, ttl: Optional[int] = None) -> Any:
-        self._cache[name] = value
-
-    def get(self, name: TKey) -> Any:
-        try:
-            return self._cache[name]
-        except KeyError:
-            return None
-
-    def remove(self, name: TKey) -> Any:
-        try:
-            del self._cache[name]
-        except KeyError:
-            pass
-
-    def ping(self) -> Any:
-        return True
-
-    def flush(self) -> Any:
-        self._cache = {}
-
-
-class Cache_Redis(Cache):
-    """
-    Simple wrapper around a redis instance
-
-    Note: Currently uses ``pickle`` to convert any python value/object to bytes
-    """
-
-    def __init__(self, host: str, port: int, password: Optional[str], db: int) -> None:
-        self._redis = redis.Redis(
-            host=host,
-            port=port,
-            password=password,
-            db=db
-        )
-
-    def set(self, name: TKey, value: TValue, ttl: Optional[int] = None) -> Any:
-        self._redis.set(name, pickle.dumps(value, protocol=5), ex=ttl)
-
-    def get(self, name: TKey) -> Any:
-        try:
-            return pickle.loads(self._redis.get(name))
-        except TypeError:
-            return None
-
-    def remove(self, name: TKey) -> Any:
-        self._redis.delete(name)
-
-    def ping(self) -> Any:
-        self._redis.ping()
-
-    def flush(self):
-        self._redis.flushdb()

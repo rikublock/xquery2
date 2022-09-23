@@ -21,12 +21,10 @@ log = logging.getLogger(__name__)
 
 @timeit
 def bench_get_block(from_block: int = 1600000, num: int = 20) -> int:
-    logging.basicConfig(level=logging.DEBUG, format=C["LOG_FORMAT"], datefmt=C["LOG_DATE_FORMAT"])
-
-    api_url = C["API_URL"]["AVAX"]
+    logging.basicConfig(level=C["LOG_LEVEL"], format=C["LOG_FORMAT"], datefmt=C["LOG_DATE_FORMAT"])
 
     try:
-        w3 = Web3(Web3.HTTPProvider(api_url))
+        w3 = Web3(Web3.HTTPProvider(endpoint_uri=C["API_URL"]))
         w3.middleware_onion.inject(geth_poa_middleware, layer=0)
     except Exception as e:
         log.error(e)

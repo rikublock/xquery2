@@ -21,7 +21,7 @@ Base = declarative_base()
 
 
 class BaseModel(object):
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(Integer, primary_key=True, unique=True, autoincrement=True)
 
 
 class BaseModelAddDelete(BaseModel):

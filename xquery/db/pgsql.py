@@ -14,7 +14,7 @@ from . import orm
 # TODO Possibly adopt https://www.gorgias.com/blog/prevent-idle-in-transaction-engineering
 
 
-class FusionPGSQL(object):
+class FusionSQL(object):
 
     def __init__(self, conn, verbose=False):
         """
@@ -34,7 +34,7 @@ class FusionPGSQL(object):
             bind=self._engine,
             autoflush=True,
             autocommit=False,
-            expire_on_commit=True,
+            expire_on_commit=False,
             future=True,
         )
 
@@ -48,13 +48,13 @@ class FusionPGSQL(object):
         Usage:
 
         # closes the session
-        with FusionPGSQL.session() as session:
+        with FusionSQL.session() as session:
             session.add(some_object)
             session.add(some_other_object)
             session.commit()
 
         # auto commits the transaction, closes the session
-        with FusionPGSQL.session.begin() as session:
+        with FusionSQL.session.begin() as session:
             session.add(some_object)
             session.add(some_other_object)
 

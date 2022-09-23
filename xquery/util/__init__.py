@@ -6,4 +6,6 @@
 #
 # This file is part of XQuery2.
 
-from . import singleton
+from .decimal import *
+from .misc import *
+from .singleton import Singleton

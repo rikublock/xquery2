@@ -6,5 +6,21 @@
 #
 # This file is part of XQuery2.
 
-from .filter_router import EventFilter_Pangolin
-from .indexer_router import EventIndexer_Pangolin
+from .filter_router import EventFilterRouterPangolin
+from .filter_exchange import (
+    EventFilterExchangePangolin,
+    EventFilterExchangePegasys,
+)
+from .indexer import (
+    EventIndexer,
+    EventIndexerDummy,
+)
+from .indexer_exchange import (
+    EventIndexerExchangePangolin,
+    EventIndexerExchangePegasys,
+)
+from .indexer_router import EventIndexerRouterPangolin
+from .processor import (
+    EventProcessor,
+    EventProcessorDummy,
+)

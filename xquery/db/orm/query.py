@@ -6,8 +6,6 @@
 #
 # This file is part of XQuery2.
 
-import enum
-
 from sqlalchemy import (
     Column,
     Enum,
@@ -22,15 +20,7 @@ from .base import (
     Base,
     BaseModel,
 )
-
-
-# TODO possibly use chain ids
-@enum.unique
-class Chains(enum.Enum):
-    UNKNOWN = 0
-    ETH = enum.auto()
-    AVAX = enum.auto()
-    SYS = enum.auto()
+from .chain import Chain
 
 
 class BaseModelXQuery(BaseModel):
@@ -40,7 +30,7 @@ class BaseModelXQuery(BaseModel):
     Contains data fields found in any Query
     """
     xhash = Column(String(length=66), nullable=False, unique=True)
-    chain = Column(Enum(Chains, name="enum_chains"), default=Chains.UNKNOWN, nullable=False)
+    chain = Column(Enum(Chain, name="enum_chains"), default=Chain.UNKNOWN, nullable=False)
     block_height = Column(Integer, nullable=False)
     block_hash = Column(String(length=66), nullable=False)
     block_timestamp = Column(Integer, nullable=False)

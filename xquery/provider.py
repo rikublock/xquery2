@@ -48,6 +48,8 @@ class BatchHTTPProvider(HTTPProvider):
         """
         Generate a call entry for a batched request.
 
+        TODO merge with JSONBaseProvider.encode_rpc_request()
+
         :param method: rpc endpoint
         :param params: method parameters
         :param request_id: index

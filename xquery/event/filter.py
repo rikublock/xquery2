@@ -64,7 +64,7 @@ class EventFilter(abc.ABC):
             self._abis[topic[0]] = abi
             self._event_names[topic[0]] = event.event_name
 
-            log.debug(f"Event(name={event.event_name}, topic={topic[0]})")
+            # log.debug(f"Event(name={event.event_name}, topic={topic[0]})")
 
     def _decode_event_data(self, logs: List[LogReceipt]) -> None:
         """
@@ -136,3 +136,15 @@ class EventFilter(abc.ABC):
         :return:
         """
         raise NotImplementedError
+
+
+class EventFilterDummy(EventFilter):
+    """
+    Dummy event filter that does nothing. Used for debugging.
+    """
+
+    def __init__(self, *args, **kwargs):
+        pass
+
+    def get_logs(self, from_block: int, chunk_size: int) -> List[ExtendedLogReceipt]:
+        return []

@@ -6,14 +6,12 @@
 #
 # This file is part of XQuery2.
 
-from typing import (
-    Any,
-    Dict,
-)
+from typing import List
 
 import abc
 import logging
 
+import xquery.db.orm as orm
 from xquery.types import ExtendedLogReceipt
 
 log = logging.getLogger(__name__)
@@ -31,11 +29,19 @@ class EventIndexer(abc.ABC):
     The goal of the indexing step is to collect all "external" data and move it to the database for processing.
 
     Note: This runs in a worker process.
-    Note: Worker processes intentionally only have read access to the database.
+    Note: Worker processes primarily have read access to the database, but may commit very distinct/specific data.
     """
 
+    def reset(self) -> None:
+        """
+        Reset the indexer after processing a job.
+
+        :return:
+        """
+        pass
+
     @abc.abstractmethod
-    def process(self, entry: ExtendedLogReceipt) -> Dict[str, Any]:
+    def process(self, entry: ExtendedLogReceipt) -> List[orm.BaseModel]:
         """
         Index an event log entry.
 
@@ -49,3 +55,15 @@ class EventIndexer(abc.ABC):
         :return:
         """
         raise NotImplementedError
+
+
+class EventIndexerDummy(EventIndexer):
+    """
+    Dummy event indexer that does nothing. Used for debugging.
+    """
+
+    def __init__(self, *args, **kwargs):
+        pass
+
+    def process(self, entry: ExtendedLogReceipt) -> List[orm.BaseModel]:
+        return []

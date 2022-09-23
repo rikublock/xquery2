@@ -24,7 +24,7 @@ log = logging.getLogger(__name__)
 
 @timeit
 def bench_serialize(num: int = 100000) -> int:
-    logging.basicConfig(level=logging.DEBUG, format=C["LOG_FORMAT"], datefmt=C["LOG_DATE_FORMAT"])
+    logging.basicConfig(level=C["LOG_LEVEL"], format=C["LOG_FORMAT"], datefmt=C["LOG_DATE_FORMAT"])
 
     data = {
         "address": "0xd7538cABBf8605BdE1f4901B47B8D42c61DE0367",

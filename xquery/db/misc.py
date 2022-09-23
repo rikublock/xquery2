@@ -8,10 +8,15 @@
 
 
 def build_url(driver: str, host: str, port: int, username: str, password: str, database: str) -> str:
-    """Format the database connection string (database dialect and connection arguments)
+    """
+    Format the database connection string (database dialect and connection arguments) for
+    the usage in sqlalchemy.
 
-    Example:
-        'postgresql://scott:tiger@localhost:5432/mydatabase'
+    See: https://docs.sqlalchemy.org/en/14/core/engines.html
+
+    Examples:
+        - 'dialect+driver://username:password@host:port/database'
+        - 'postgresql://scott:tiger@localhost:5432/mydatabase'
 
     :return:
     """

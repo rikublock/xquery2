@@ -7,4 +7,4 @@
 # This file is part of XQuery2.
 
 from .misc import build_url
-from .pgsql import FusionPGSQL
+from .pgsql import FusionSQL

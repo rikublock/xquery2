@@ -20,7 +20,7 @@ from sqlalchemy import pool
 
 from alembic import context
 
-import xquery.db.orm
+import xquery.db.orm as orm
 from xquery.db.misc import build_url
 from xquery.config import CONFIG as C
 
@@ -35,7 +35,7 @@ if config.config_file_name is not None:
 
 # add your model's MetaData object here
 # for 'autogenerate' support
-target_metadata = xquery.db.orm.Base.metadata
+target_metadata = orm.Base.metadata
 
 
 def get_url() -> str:

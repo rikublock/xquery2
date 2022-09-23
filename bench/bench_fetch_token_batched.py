@@ -21,10 +21,10 @@ from web3._utils.contracts import (
 )
 from web3._utils.abi import get_abi_output_types
 
-import xquery.provider
 import xquery.contract
 
 from xquery.config import CONFIG as C
+from xquery.provider import BatchHTTPProvider
 from xquery.util.misc import timeit
 
 log = logging.getLogger(__name__)
@@ -36,12 +36,10 @@ ADDRESS = "0x60781C2586D68229fde47564546784ab3fACA982"
 
 @timeit
 def batch_fetch_token_batched() -> int:
-    logging.basicConfig(level=logging.DEBUG, format=C["LOG_FORMAT"], datefmt=C["LOG_DATE_FORMAT"])
-
-    api_url = C["API_URL"]["AVAX"]
+    logging.basicConfig(level=C["LOG_LEVEL"], format=C["LOG_FORMAT"], datefmt=C["LOG_DATE_FORMAT"])
 
     try:
-        w3 = Web3(xquery.provider.BatchHTTPProvider(api_url))
+        w3 = Web3(BatchHTTPProvider(endpoint_uri=C["API_URL"]))
         w3.middleware_onion.inject(geth_poa_middleware, layer=0)
     except Exception as e:
         log.error(e)
@@ -65,7 +63,7 @@ def batch_fetch_token_batched() -> int:
             contract_abi=rc20.abi,
         )
 
-        calls.append(xquery.provider.BatchHTTPProvider.build_entry(
+        calls.append(BatchHTTPProvider.build_entry(
             method=RPCEndpoint("eth_call"),
             params=[
                 {

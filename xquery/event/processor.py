@@ -34,3 +34,15 @@ class EventProcessor(abc.ABC):
         :return:
         """
         raise NotImplementedError
+
+
+class EventProcessorDummy(EventProcessor):
+    """
+    Dummy event processor that does nothing. Used for debugging.
+    """
+
+    def __init__(self, *args, **kwargs) -> None:
+        pass
+
+    def process(self) -> None:
+        return None
