@@ -151,7 +151,12 @@ def main() -> int:
 if __name__ == "__main__":
     try:
         with pidfile.PIDFile("xquery.pid"):
-            sys.exit(main())
+            #sys.exit(main())
+            while True:
+                main()
+                # Rerun the indexer every 30 secs to keep indexed db in sync w/ blockchain
+                log.info("Restarting indexing after 60 secs...")
+                time.sleep(60)
     except pidfile.AlreadyRunningError:
         print("Already running. Exiting.")
         sys.exit(1)
