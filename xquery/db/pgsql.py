@@ -6,6 +6,8 @@
 #
 # This file is part of XQuery2.
 
+import logging
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -28,7 +30,10 @@ class FusionSQL(object):
         assert isinstance(conn, str)
         assert isinstance(verbose, bool)
 
-        self._engine = create_engine(conn, echo=verbose, future=True)
+        self._engine = create_engine(conn, echo=False, future=True)
+
+        if verbose:
+            logging.getLogger("sqlalchemy.engine").setLevel(logging.DEBUG)
 
         self._session = sessionmaker(
             bind=self._engine,

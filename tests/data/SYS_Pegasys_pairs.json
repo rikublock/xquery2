@@ -1,0 +1,959 @@
+{
+  "blockNumber": 186358,
+  "pairs": [
+    "0x544B75e6B80572161ce36996E3492cb949D9AB3e",
+    "0x0d251027AA21D1E22fe98A9Fb3947cF0A1943dD9",
+    "0x2CDF912CbeaF76d67feaDC994D889c2F4442b300",
+    "0x8c741Cd1Dc4D027034ce864FFD660BFa44c24674",
+    "0x1cF22F868D15d4Eed8EddFA8c9C0b88C24B3e0b0",
+    "0xB881304fCd792062732Da050828f74D285BbF078",
+    "0x0Df7d92a4DB09d3828a725D039B89FDC8dfC96A6",
+    "0x08Fd5c77Bbd362eB4C1208AF1E937CB90c441d08",
+    "0xd4d3A12eeD9E2bEBc18Bbf9e9aB74EE48181169c",
+    "0x3DE7BEE2cA971f3D3D7dD04bE028161912513d55",
+    "0xE281d64Be2BC0901E56D747D9Ef641cB761ac10e",
+    "0x62e3c4781581c4942F7667625091a3AF1d672683",
+    "0x7E390d8598391eC98e95f12A42f83Cf75038D2D0",
+    "0xCd19aA6122a181130832629AE4701188c017E7CE",
+    "0xCF765b63D4866C4AFF4aF73a19cd63540016ebFE",
+    "0xB444D42Ce72EC028ADdB89677EcF8FC991a97F6e",
+    "0xd6690D792FaD3969cA03a2d9a2e297BF67ADb8f3",
+    "0x8620C5e66Caa8DC5fd686814DEc78A454458e7E3",
+    "0x7701A7e868165B098C20A6B8b64A2216F2AfAC79",
+    "0x7b7eA8eE9429f3Ee8E9c050cc2f4d87D81fddf21",
+    "0x86956CAeBEDD4776aC2E6C4468CB18AfbCCaAC03",
+    "0x0CA3f9E8B2c6CC76715eD64e37bB5B1AF756bc67",
+    "0xA72CFaE7e4CfEc26239731B0adA253BAe67A89aE",
+    "0x72BE09C687AB6fE5ba760EBCF17AcF01E2681db1",
+    "0xfB99075aff790Ce7429058Ce91D5D488A0A31f61",
+    "0x56Dbc5768CE4D674228e6825Cb919b402aF428Fc",
+    "0x89a76c03FadE35873c885A3EC0B3adD39D4CC549",
+    "0x54e18329B626577aE1dc63FD59103BD17c5e5646",
+    "0x8b2bc127Bd8d0dfEb8854b146a83102B1119934C",
+    "0x3cE59876811415b7d228C51F751eEd2AD30b18C2",
+    "0xA0c172FFaaDA2fF8623E455E360620106c7c8eA3",
+    "0xBd2550EDCbDa34378D9a116350B56aF3A4694F97",
+    "0x8F62458bE3c41DaC405362F0D7de0DAbB2EB1deA",
+    "0xB492B3075Dcc3052ad9017Fcf3B22e22f41F283d",
+    "0xC9E61d7A1Ed9049FAA5Dae26354207eb9a20B81b",
+    "0xb41EF4a00523b44603d001ed629945BE070B8Ba7",
+    "0xD0156a1AC801c6B4C8A334D0F11723dAc520E419",
+    "0x228123ad380ac9dC15a7E9279d8B16e414CEE6Dc",
+    "0x95e6EBbEDBB00Dec52fE7dFCBAe5f99b6D064E99",
+    "0x38f067F75735BFCeBf4e131F5A2D58d592759c2B",
+    "0x81155A311f2Effcaa4489Fad045b288869BbaEc8",
+    "0xd7197123E19D2A8d6eEBb76a63d7A71a3Ec76e76",
+    "0x90eFc30d84f8ca04450256C1922BB91893e7e17d",
+    "0x9504df3928003649A820A10bf4B1491Aa4085927",
+    "0x2984Bf0674098eFf6cc91A291BBb25867895Be5A",
+    "0x93f6a9f21a2c857998D3f186808Ef7e2c6a0E0ff",
+    "0xE4115c19Ba34E5bb36fD1C61df1359b3aE7614CB",
+    "0x90972EE60Ce77024f4F9C2792857703C176bC62f",
+    "0x4B2C051F06610F7011c7553Ff2549771Cc95b27d",
+    "0x1a7400F4DFE299DBac8034bD2Bb0B3B17fCA9342",
+    "0xDA3995D0ADDb43935A0c17c187C271Cc6c07Df21",
+    "0xc51C09A8CD88202e8519ece73e98DA289fe796ea",
+    "0xC9Ea7a06D19dd07674c3c077dd07Dea4934a71df",
+    "0x6e3b7128334C47546c641f56aC2344947A334a69",
+    "0x40D98e25630Fec36C93083D29d7Bc831e87fF2d7",
+    "0x9a7787351c6eB126f66AE1eD8A982721090FD627",
+    "0xA4C88Cc3DBd0cC61774a67229F6d937C08942dDd",
+    "0x6CfE7Ff0899eb1d211477dafB248750626ef1369",
+    "0x1532d364478808241Ae130F6a8d99ea447F14F4e",
+    "0x3c606d8C8faF53308Ea1Dd32F4Fd426c9ce24F09",
+    "0x1cCdFf8e371f2Ac313488676Cc5Ab1a9F465F217",
+    "0xf42B285Fd130f4E00B9F6fdFb0fc7E20708dE12C"
+  ],
+  "tokens": [
+    "0x03D2F177c247f01d6Aa4fa4fA796A7930AD186D3",
+    "0x0913679662e38f798CcB7fc4160cd4F7C5bFdac5",
+    "0x11cc9bfB257E09e5822BcF2F4063f38FE8c25113",
+    "0x1CcCA1cE62c62F7Be95d4A67722a8fDbed6EEcb4",
+    "0x2bF9b864cdc97b08B6D79ad4663e71B8aB65c45c",
+    "0x375488F097176507e39B9653b88FDc52cDE736Bf",
+    "0x384343313015ca2D1c0e6f8d2C0C092fD6Bea3d5",
+    "0x3aA3bC0884A906692C3B359FE874215623E90963",
+    "0x3b10A1Fe83D057EeAb7242c7BF99824FD28Db6eC",
+    "0x40C39575bC6d39aAa7999B4cC0B1A6Ee0a3B838b",
+    "0x44489c718DE91041C8F843F95B6c5A8ed48c0222",
+    "0x461d52769884ca6235B685EF2040F47d30C94EB5",
+    "0x4B426b4a9C352e54311781d070923d692418FD8A",
+    "0x5299fc7B4CCDfc82A808df2BD490871bA764ef1C",
+    "0x53a71bcD6437EFB47326577468e9e931420151e0",
+    "0x6aE73f43cc18Bb9ffB35204023C6C7897CA879C4",
+    "0x6b7a87899490EcE95443e979cA9485CBE7E71522",
+    "0x72Ef8f05E55339C265861298938900605023967d",
+    "0x76fc9621e8e85A43FCFb61786C06D22621d3aA75",
+    "0x7C598c96D02398d89FbCb9d41Eab3DF0C16F227D",
+    "0x87948f9520661394c15735646Df25b587fdb6aa6",
+    "0x88b360da1C27E7adBFFcD594Ba99a372aBe40421",
+    "0x8aF8B25A42f034a6c1BAA05ff15114dD482B85F5",
+    "0x922D641a426DcFFaeF11680e5358F34d97d112E1",
+    "0xa338e24926e4FA099a565EfB18374B3592A37662",
+    "0xa9a4f39252d5C57ce94ee62411E674e4e82c2064",
+    "0xB3d06b7d05969f806603702b084786e2ABe63460",
+    "0xBbBEB0E02aFEA4D30340961E8E541054b91B668F",
+    "0xc8C124493Ab0F4A7A0442FAD2B05542879913A0F",
+    "0xc9BAA8cfdDe8E328787E29b4B078abf2DaDc2055",
+    "0xcc9dB24106CbA26F37A0e68B1b7300929269e640",
+    "0xd30234FC41b2312D58356f7E6948f6cd8e73cA42",
+    "0xd3e822f3ef011Ca5f17D82C956D952D8d7C3A1BB",
+    "0xE18c200A70908c89fFA18C628fE1B83aC0065EA4",
+    "0xe865bA5FEE807dCCD41A669A51aD5F3a7467C47E",
+    "0xeFAeeE334F0Fd1712f9a8cc375f427D9Cdd40d73",
+    "0xf27Ee99622C3C9b264583dACB2cCE056e194494f",
+    "0xfdB9d2D0904F0089EAC56a423EAC15731340fCaC"
+  ],
+  "pairDetails": {
+    "0x544B75e6B80572161ce36996E3492cb949D9AB3e": [
+      [
+        "0x40C39575bC6d39aAa7999B4cC0B1A6Ee0a3B838b",
+        "MOCK"
+      ],
+      [
+        "0xd3e822f3ef011Ca5f17D82C956D952D8d7C3A1BB",
+        "WSYS"
+      ]
+    ],
+    "0x0d251027AA21D1E22fe98A9Fb3947cF0A1943dD9": [
+      [
+        "0x6aE73f43cc18Bb9ffB35204023C6C7897CA879C4",
+        "TOKEN"
+      ],
+      [
+        "0xd3e822f3ef011Ca5f17D82C956D952D8d7C3A1BB",
+        "WSYS"
+      ]
+    ],
+    "0x2CDF912CbeaF76d67feaDC994D889c2F4442b300": [
+      [
+        "0x2bF9b864cdc97b08B6D79ad4663e71B8aB65c45c",
+        "USDC"
+      ],
+      [
+        "0xd3e822f3ef011Ca5f17D82C956D952D8d7C3A1BB",
+        "WSYS"
+      ]
+    ],
+    "0x8c741Cd1Dc4D027034ce864FFD660BFa44c24674": [
+      [
+        "0x2bF9b864cdc97b08B6D79ad4663e71B8aB65c45c",
+        "USDC"
+      ],
+      [
+        "0x922D641a426DcFFaeF11680e5358F34d97d112E1",
+        "USDT"
+      ]
+    ],
+    "0x1cF22F868D15d4Eed8EddFA8c9C0b88C24B3e0b0": [
+      [
+        "0x7C598c96D02398d89FbCb9d41Eab3DF0C16F227D",
+        "ETH"
+      ],
+      [
+        "0xd3e822f3ef011Ca5f17D82C956D952D8d7C3A1BB",
+        "WSYS"
+      ]
+    ],
+    "0xB881304fCd792062732Da050828f74D285BbF078": [
+      [
+        "0xc9BAA8cfdDe8E328787E29b4B078abf2DaDc2055",
+        "WBTC"
+      ],
+      [
+        "0xd3e822f3ef011Ca5f17D82C956D952D8d7C3A1BB",
+        "WSYS"
+      ]
+    ],
+    "0x0Df7d92a4DB09d3828a725D039B89FDC8dfC96A6": [
+      [
+        "0x922D641a426DcFFaeF11680e5358F34d97d112E1",
+        "USDT"
+      ],
+      [
+        "0xd3e822f3ef011Ca5f17D82C956D952D8d7C3A1BB",
+        "WSYS"
+      ]
+    ],
+    "0x08Fd5c77Bbd362eB4C1208AF1E937CB90c441d08": [
+      [
+        "0x4B426b4a9C352e54311781d070923d692418FD8A",
+        "SDOGE"
+      ],
+      [
+        "0xd3e822f3ef011Ca5f17D82C956D952D8d7C3A1BB",
+        "WSYS"
+      ]
+    ],
+    "0xd4d3A12eeD9E2bEBc18Bbf9e9aB74EE48181169c": [
+      [
+        "0x7C598c96D02398d89FbCb9d41Eab3DF0C16F227D",
+        "ETH"
+      ],
+      [
+        "0xc9BAA8cfdDe8E328787E29b4B078abf2DaDc2055",
+        "WBTC"
+      ]
+    ],
+    "0x3DE7BEE2cA971f3D3D7dD04bE028161912513d55": [
+      [
+        "0xd3e822f3ef011Ca5f17D82C956D952D8d7C3A1BB",
+        "WSYS"
+      ],
+      [
+        "0xeFAeeE334F0Fd1712f9a8cc375f427D9Cdd40d73",
+        "DAI"
+      ]
+    ],
+    "0xE281d64Be2BC0901E56D747D9Ef641cB761ac10e": [
+      [
+        "0x2bF9b864cdc97b08B6D79ad4663e71B8aB65c45c",
+        "USDC"
+      ],
+      [
+        "0xc9BAA8cfdDe8E328787E29b4B078abf2DaDc2055",
+        "WBTC"
+      ]
+    ],
+    "0x62e3c4781581c4942F7667625091a3AF1d672683": [
+      [
+        "0x53a71bcD6437EFB47326577468e9e931420151e0",
+        "Syshiba"
+      ],
+      [
+        "0xd3e822f3ef011Ca5f17D82C956D952D8d7C3A1BB",
+        "WSYS"
+      ]
+    ],
+    "0x7E390d8598391eC98e95f12A42f83Cf75038D2D0": [
+      [
+        "0x2bF9b864cdc97b08B6D79ad4663e71B8aB65c45c",
+        "USDC"
+      ],
+      [
+        "0x7C598c96D02398d89FbCb9d41Eab3DF0C16F227D",
+        "ETH"
+      ]
+    ],
+    "0xCd19aA6122a181130832629AE4701188c017E7CE": [
+      [
+        "0x76fc9621e8e85A43FCFb61786C06D22621d3aA75",
+        "test"
+      ],
+      [
+        "0xd3e822f3ef011Ca5f17D82C956D952D8d7C3A1BB",
+        "WSYS"
+      ]
+    ],
+    "0xCF765b63D4866C4AFF4aF73a19cd63540016ebFE": [
+      [
+        "0x72Ef8f05E55339C265861298938900605023967d",
+        "test"
+      ],
+      [
+        "0xd3e822f3ef011Ca5f17D82C956D952D8d7C3A1BB",
+        "WSYS"
+      ]
+    ],
+    "0xB444D42Ce72EC028ADdB89677EcF8FC991a97F6e": [
+      [
+        "0x44489c718DE91041C8F843F95B6c5A8ed48c0222",
+        "test"
+      ],
+      [
+        "0xd3e822f3ef011Ca5f17D82C956D952D8d7C3A1BB",
+        "WSYS"
+      ]
+    ],
+    "0xd6690D792FaD3969cA03a2d9a2e297BF67ADb8f3": [
+      [
+        "0x11cc9bfB257E09e5822BcF2F4063f38FE8c25113",
+        "Sysdoge"
+      ],
+      [
+        "0xd3e822f3ef011Ca5f17D82C956D952D8d7C3A1BB",
+        "WSYS"
+      ]
+    ],
+    "0x8620C5e66Caa8DC5fd686814DEc78A454458e7E3": [
+      [
+        "0x87948f9520661394c15735646Df25b587fdb6aa6",
+        "SHYB"
+      ],
+      [
+        "0xd3e822f3ef011Ca5f17D82C956D952D8d7C3A1BB",
+        "WSYS"
+      ]
+    ],
+    "0x7701A7e868165B098C20A6B8b64A2216F2AfAC79": [
+      [
+        "0x88b360da1C27E7adBFFcD594Ba99a372aBe40421",
+        "test"
+      ],
+      [
+        "0xd3e822f3ef011Ca5f17D82C956D952D8d7C3A1BB",
+        "WSYS"
+      ]
+    ],
+    "0x7b7eA8eE9429f3Ee8E9c050cc2f4d87D81fddf21": [
+      [
+        "0x3b10A1Fe83D057EeAb7242c7BF99824FD28Db6eC",
+        "test"
+      ],
+      [
+        "0xd3e822f3ef011Ca5f17D82C956D952D8d7C3A1BB",
+        "WSYS"
+      ]
+    ],
+    "0x86956CAeBEDD4776aC2E6C4468CB18AfbCCaAC03": [
+      [
+        "0xd3e822f3ef011Ca5f17D82C956D952D8d7C3A1BB",
+        "WSYS"
+      ],
+      [
+        "0xfdB9d2D0904F0089EAC56a423EAC15731340fCaC",
+        "test"
+      ]
+    ],
+    "0x0CA3f9E8B2c6CC76715eD64e37bB5B1AF756bc67": [
+      [
+        "0xa9a4f39252d5C57ce94ee62411E674e4e82c2064",
+        "SMART"
+      ],
+      [
+        "0xd3e822f3ef011Ca5f17D82C956D952D8d7C3A1BB",
+        "WSYS"
+      ]
+    ],
+    "0xA72CFaE7e4CfEc26239731B0adA253BAe67A89aE": [
+      [
+        "0xc8C124493Ab0F4A7A0442FAD2B05542879913A0F",
+        "SMART"
+      ],
+      [
+        "0xd3e822f3ef011Ca5f17D82C956D952D8d7C3A1BB",
+        "WSYS"
+      ]
+    ],
+    "0x72BE09C687AB6fE5ba760EBCF17AcF01E2681db1": [
+      [
+        "0x11cc9bfB257E09e5822BcF2F4063f38FE8c25113",
+        "Sysdoge"
+      ],
+      [
+        "0x2bF9b864cdc97b08B6D79ad4663e71B8aB65c45c",
+        "USDC"
+      ]
+    ],
+    "0xfB99075aff790Ce7429058Ce91D5D488A0A31f61": [
+      [
+        "0x11cc9bfB257E09e5822BcF2F4063f38FE8c25113",
+        "Sysdoge"
+      ],
+      [
+        "0xeFAeeE334F0Fd1712f9a8cc375f427D9Cdd40d73",
+        "DAI"
+      ]
+    ],
+    "0x56Dbc5768CE4D674228e6825Cb919b402aF428Fc": [
+      [
+        "0x922D641a426DcFFaeF11680e5358F34d97d112E1",
+        "USDT"
+      ],
+      [
+        "0xeFAeeE334F0Fd1712f9a8cc375f427D9Cdd40d73",
+        "DAI"
+      ]
+    ],
+    "0x89a76c03FadE35873c885A3EC0B3adD39D4CC549": [
+      [
+        "0x7C598c96D02398d89FbCb9d41Eab3DF0C16F227D",
+        "ETH"
+      ],
+      [
+        "0x922D641a426DcFFaeF11680e5358F34d97d112E1",
+        "USDT"
+      ]
+    ],
+    "0x54e18329B626577aE1dc63FD59103BD17c5e5646": [
+      [
+        "0x922D641a426DcFFaeF11680e5358F34d97d112E1",
+        "USDT"
+      ],
+      [
+        "0xc9BAA8cfdDe8E328787E29b4B078abf2DaDc2055",
+        "WBTC"
+      ]
+    ],
+    "0x8b2bc127Bd8d0dfEb8854b146a83102B1119934C": [
+      [
+        "0xc9BAA8cfdDe8E328787E29b4B078abf2DaDc2055",
+        "WBTC"
+      ],
+      [
+        "0xeFAeeE334F0Fd1712f9a8cc375f427D9Cdd40d73",
+        "DAI"
+      ]
+    ],
+    "0x3cE59876811415b7d228C51F751eEd2AD30b18C2": [
+      [
+        "0x7C598c96D02398d89FbCb9d41Eab3DF0C16F227D",
+        "ETH"
+      ],
+      [
+        "0xeFAeeE334F0Fd1712f9a8cc375f427D9Cdd40d73",
+        "DAI"
+      ]
+    ],
+    "0xA0c172FFaaDA2fF8623E455E360620106c7c8eA3": [
+      [
+        "0x2bF9b864cdc97b08B6D79ad4663e71B8aB65c45c",
+        "USDC"
+      ],
+      [
+        "0xeFAeeE334F0Fd1712f9a8cc375f427D9Cdd40d73",
+        "DAI"
+      ]
+    ],
+    "0xBd2550EDCbDa34378D9a116350B56aF3A4694F97": [
+      [
+        "0x461d52769884ca6235B685EF2040F47d30C94EB5",
+        "TUSD"
+      ],
+      [
+        "0xeFAeeE334F0Fd1712f9a8cc375f427D9Cdd40d73",
+        "DAI"
+      ]
+    ],
+    "0x8F62458bE3c41DaC405362F0D7de0DAbB2EB1deA": [
+      [
+        "0x461d52769884ca6235B685EF2040F47d30C94EB5",
+        "TUSD"
+      ],
+      [
+        "0x922D641a426DcFFaeF11680e5358F34d97d112E1",
+        "USDT"
+      ]
+    ],
+    "0xB492B3075Dcc3052ad9017Fcf3B22e22f41F283d": [
+      [
+        "0x461d52769884ca6235B685EF2040F47d30C94EB5",
+        "TUSD"
+      ],
+      [
+        "0xd3e822f3ef011Ca5f17D82C956D952D8d7C3A1BB",
+        "WSYS"
+      ]
+    ],
+    "0xC9E61d7A1Ed9049FAA5Dae26354207eb9a20B81b": [
+      [
+        "0x2bF9b864cdc97b08B6D79ad4663e71B8aB65c45c",
+        "USDC"
+      ],
+      [
+        "0x461d52769884ca6235B685EF2040F47d30C94EB5",
+        "TUSD"
+      ]
+    ],
+    "0xb41EF4a00523b44603d001ed629945BE070B8Ba7": [
+      [
+        "0x461d52769884ca6235B685EF2040F47d30C94EB5",
+        "TUSD"
+      ],
+      [
+        "0xc9BAA8cfdDe8E328787E29b4B078abf2DaDc2055",
+        "WBTC"
+      ]
+    ],
+    "0xD0156a1AC801c6B4C8A334D0F11723dAc520E419": [
+      [
+        "0x03D2F177c247f01d6Aa4fa4fA796A7930AD186D3",
+        "TSYS"
+      ],
+      [
+        "0xd3e822f3ef011Ca5f17D82C956D952D8d7C3A1BB",
+        "WSYS"
+      ]
+    ],
+    "0x228123ad380ac9dC15a7E9279d8B16e414CEE6Dc": [
+      [
+        "0xa338e24926e4FA099a565EfB18374B3592A37662",
+        "SYM"
+      ],
+      [
+        "0xd3e822f3ef011Ca5f17D82C956D952D8d7C3A1BB",
+        "WSYS"
+      ]
+    ],
+    "0x95e6EBbEDBB00Dec52fE7dFCBAe5f99b6D064E99": [
+      [
+        "0xcc9dB24106CbA26F37A0e68B1b7300929269e640",
+        "SMS"
+      ],
+      [
+        "0xd3e822f3ef011Ca5f17D82C956D952D8d7C3A1BB",
+        "WSYS"
+      ]
+    ],
+    "0x38f067F75735BFCeBf4e131F5A2D58d592759c2B": [
+      [
+        "0x8aF8B25A42f034a6c1BAA05ff15114dD482B85F5",
+        "SHYB"
+      ],
+      [
+        "0xd3e822f3ef011Ca5f17D82C956D952D8d7C3A1BB",
+        "WSYS"
+      ]
+    ],
+    "0x81155A311f2Effcaa4489Fad045b288869BbaEc8": [
+      [
+        "0xd30234FC41b2312D58356f7E6948f6cd8e73cA42",
+        "EWCL"
+      ],
+      [
+        "0xd3e822f3ef011Ca5f17D82C956D952D8d7C3A1BB",
+        "WSYS"
+      ]
+    ],
+    "0xd7197123E19D2A8d6eEBb76a63d7A71a3Ec76e76": [
+      [
+        "0xBbBEB0E02aFEA4D30340961E8E541054b91B668F",
+        "UTTKE"
+      ],
+      [
+        "0xd3e822f3ef011Ca5f17D82C956D952D8d7C3A1BB",
+        "WSYS"
+      ]
+    ],
+    "0x90eFc30d84f8ca04450256C1922BB91893e7e17d": [
+      [
+        "0x2bF9b864cdc97b08B6D79ad4663e71B8aB65c45c",
+        "USDC"
+      ],
+      [
+        "0xBbBEB0E02aFEA4D30340961E8E541054b91B668F",
+        "UTTKE"
+      ]
+    ],
+    "0x9504df3928003649A820A10bf4B1491Aa4085927": [
+      [
+        "0x375488F097176507e39B9653b88FDc52cDE736Bf",
+        "BUSD"
+      ],
+      [
+        "0x922D641a426DcFFaeF11680e5358F34d97d112E1",
+        "USDT"
+      ]
+    ],
+    "0x2984Bf0674098eFf6cc91A291BBb25867895Be5A": [
+      [
+        "0x2bF9b864cdc97b08B6D79ad4663e71B8aB65c45c",
+        "USDC"
+      ],
+      [
+        "0x375488F097176507e39B9653b88FDc52cDE736Bf",
+        "BUSD"
+      ]
+    ],
+    "0x93f6a9f21a2c857998D3f186808Ef7e2c6a0E0ff": [
+      [
+        "0xd3e822f3ef011Ca5f17D82C956D952D8d7C3A1BB",
+        "WSYS"
+      ],
+      [
+        "0xf27Ee99622C3C9b264583dACB2cCE056e194494f",
+        "BNB"
+      ]
+    ],
+    "0xE4115c19Ba34E5bb36fD1C61df1359b3aE7614CB": [
+      [
+        "0x375488F097176507e39B9653b88FDc52cDE736Bf",
+        "BUSD"
+      ],
+      [
+        "0xd3e822f3ef011Ca5f17D82C956D952D8d7C3A1BB",
+        "WSYS"
+      ]
+    ],
+    "0x90972EE60Ce77024f4F9C2792857703C176bC62f": [
+      [
+        "0x2bF9b864cdc97b08B6D79ad4663e71B8aB65c45c",
+        "USDC"
+      ],
+      [
+        "0x6aE73f43cc18Bb9ffB35204023C6C7897CA879C4",
+        "TOKEN"
+      ]
+    ],
+    "0x4B2C051F06610F7011c7553Ff2549771Cc95b27d": [
+      [
+        "0x0913679662e38f798CcB7fc4160cd4F7C5bFdac5",
+        "DAPP"
+      ],
+      [
+        "0xd3e822f3ef011Ca5f17D82C956D952D8d7C3A1BB",
+        "WSYS"
+      ]
+    ],
+    "0x1a7400F4DFE299DBac8034bD2Bb0B3B17fCA9342": [
+      [
+        "0xd3e822f3ef011Ca5f17D82C956D952D8d7C3A1BB",
+        "WSYS"
+      ],
+      [
+        "0xE18c200A70908c89fFA18C628fE1B83aC0065EA4",
+        "PSYS"
+      ]
+    ],
+    "0xDA3995D0ADDb43935A0c17c187C271Cc6c07Df21": [
+      [
+        "0x2bF9b864cdc97b08B6D79ad4663e71B8aB65c45c",
+        "USDC"
+      ],
+      [
+        "0xE18c200A70908c89fFA18C628fE1B83aC0065EA4",
+        "PSYS"
+      ]
+    ],
+    "0xc51C09A8CD88202e8519ece73e98DA289fe796ea": [
+      [
+        "0x7C598c96D02398d89FbCb9d41Eab3DF0C16F227D",
+        "ETH"
+      ],
+      [
+        "0xE18c200A70908c89fFA18C628fE1B83aC0065EA4",
+        "PSYS"
+      ]
+    ],
+    "0xC9Ea7a06D19dd07674c3c077dd07Dea4934a71df": [
+      [
+        "0x5299fc7B4CCDfc82A808df2BD490871bA764ef1C",
+        "Sysdoge"
+      ],
+      [
+        "0xd3e822f3ef011Ca5f17D82C956D952D8d7C3A1BB",
+        "WSYS"
+      ]
+    ],
+    "0x6e3b7128334C47546c641f56aC2344947A334a69": [
+      [
+        "0x922D641a426DcFFaeF11680e5358F34d97d112E1",
+        "USDT"
+      ],
+      [
+        "0xE18c200A70908c89fFA18C628fE1B83aC0065EA4",
+        "PSYS"
+      ]
+    ],
+    "0x40D98e25630Fec36C93083D29d7Bc831e87fF2d7": [
+      [
+        "0xc9BAA8cfdDe8E328787E29b4B078abf2DaDc2055",
+        "WBTC"
+      ],
+      [
+        "0xE18c200A70908c89fFA18C628fE1B83aC0065EA4",
+        "PSYS"
+      ]
+    ],
+    "0x9a7787351c6eB126f66AE1eD8A982721090FD627": [
+      [
+        "0xB3d06b7d05969f806603702b084786e2ABe63460",
+        "SUS"
+      ],
+      [
+        "0xd3e822f3ef011Ca5f17D82C956D952D8d7C3A1BB",
+        "WSYS"
+      ]
+    ],
+    "0xA4C88Cc3DBd0cC61774a67229F6d937C08942dDd": [
+      [
+        "0xd3e822f3ef011Ca5f17D82C956D952D8d7C3A1BB",
+        "WSYS"
+      ],
+      [
+        "0xe865bA5FEE807dCCD41A669A51aD5F3a7467C47E",
+        "CIS"
+      ]
+    ],
+    "0x6CfE7Ff0899eb1d211477dafB248750626ef1369": [
+      [
+        "0x3aA3bC0884A906692C3B359FE874215623E90963",
+        "BUTC"
+      ],
+      [
+        "0xd3e822f3ef011Ca5f17D82C956D952D8d7C3A1BB",
+        "WSYS"
+      ]
+    ],
+    "0x1532d364478808241Ae130F6a8d99ea447F14F4e": [
+      [
+        "0x384343313015ca2D1c0e6f8d2C0C092fD6Bea3d5",
+        "LTC"
+      ],
+      [
+        "0xd3e822f3ef011Ca5f17D82C956D952D8d7C3A1BB",
+        "WSYS"
+      ]
+    ],
+    "0x3c606d8C8faF53308Ea1Dd32F4Fd426c9ce24F09": [
+      [
+        "0x6b7a87899490EcE95443e979cA9485CBE7E71522",
+        "LUXY"
+      ],
+      [
+        "0xd3e822f3ef011Ca5f17D82C956D952D8d7C3A1BB",
+        "WSYS"
+      ]
+    ],
+    "0x1cCdFf8e371f2Ac313488676Cc5Ab1a9F465F217": [
+      [
+        "0x6b7a87899490EcE95443e979cA9485CBE7E71522",
+        "LUXY"
+      ],
+      [
+        "0xE18c200A70908c89fFA18C628fE1B83aC0065EA4",
+        "PSYS"
+      ]
+    ],
+    "0xf42B285Fd130f4E00B9F6fdFb0fc7E20708dE12C": [
+      [
+        "0x1CcCA1cE62c62F7Be95d4A67722a8fDbed6EEcb4",
+        "sysBLOCK"
+      ],
+      [
+        "0xd3e822f3ef011Ca5f17D82C956D952D8d7C3A1BB",
+        "WSYS"
+      ]
+    ]
+  },
+  "tokenDetails": {
+    "0x03D2F177c247f01d6Aa4fa4fA796A7930AD186D3": [
+      "TSYS",
+      "Token",
+      18,
+      1000000000000000000000000
+    ],
+    "0x0913679662e38f798CcB7fc4160cd4F7C5bFdac5": [
+      "DAPP",
+      "DApp Token",
+      18,
+      1000000000000000000000000
+    ],
+    "0x11cc9bfB257E09e5822BcF2F4063f38FE8c25113": [
+      "Sysdoge",
+      "Sysdoge",
+      6,
+      1000000000000000
+    ],
+    "0x1CcCA1cE62c62F7Be95d4A67722a8fDbed6EEcb4": [
+      "sysBLOCK",
+      "Syscoin BLOCK",
+      8,
+      14700000000
+    ],
+    "0x2bF9b864cdc97b08B6D79ad4663e71B8aB65c45c": [
+      "USDC",
+      "USD Coin",
+      6,
+      646550609269
+    ],
+    "0x375488F097176507e39B9653b88FDc52cDE736Bf": [
+      "BUSD",
+      "Binance-Peg BUSD Token",
+      18,
+      56407328792357234884084
+    ],
+    "0x384343313015ca2D1c0e6f8d2C0C092fD6Bea3d5": [
+      "LTC",
+      "Litcoin",
+      18,
+      84000000000000000000000000
+    ],
+    "0x3aA3bC0884A906692C3B359FE874215623E90963": [
+      "BUTC",
+      "Buttcoin",
+      18,
+      21000000000000000000000000
+    ],
+    "0x3b10A1Fe83D057EeAb7242c7BF99824FD28Db6eC": [
+      "test",
+      "test",
+      4,
+      10000000000000
+    ],
+    "0x40C39575bC6d39aAa7999B4cC0B1A6Ee0a3B838b": [
+      "MOCK",
+      "MockToken",
+      18,
+      1000000000000000000000000
+    ],
+    "0x44489c718DE91041C8F843F95B6c5A8ed48c0222": [
+      "test",
+      "test",
+      4,
+      10000000000000
+    ],
+    "0x461d52769884ca6235B685EF2040F47d30C94EB5": [
+      "TUSD",
+      "TrueUSD",
+      18,
+      1984200000000000000000
+    ],
+    "0x4B426b4a9C352e54311781d070923d692418FD8A": [
+      "SDOGE",
+      "SysDoge",
+      4,
+      10000000000000
+    ],
+    "0x5299fc7B4CCDfc82A808df2BD490871bA764ef1C": [
+      "Sysdoge",
+      "SysDoge",
+      6,
+      10000000000000000
+    ],
+    "0x53a71bcD6437EFB47326577468e9e931420151e0": [
+      "Syshiba",
+      "Syshiba",
+      6,
+      1000000000000000
+    ],
+    "0x6aE73f43cc18Bb9ffB35204023C6C7897CA879C4": [
+      "TOKEN",
+      "Token",
+      18,
+      1000000000000000000000000
+    ],
+    "0x6b7a87899490EcE95443e979cA9485CBE7E71522": [
+      "LUXY",
+      "LUXY",
+      18,
+      7717165058134915521561589
+    ],
+    "0x72Ef8f05E55339C265861298938900605023967d": [
+      "test",
+      "test",
+      4,
+      10000000000000
+    ],
+    "0x76fc9621e8e85A43FCFb61786C06D22621d3aA75": [
+      "test",
+      "test",
+      4,
+      10000000000000
+    ],
+    "0x7C598c96D02398d89FbCb9d41Eab3DF0C16F227D": [
+      "ETH",
+      "Ethereum",
+      18,
+      69186303739325978094
+    ],
+    "0x87948f9520661394c15735646Df25b587fdb6aa6": [
+      "SHYB",
+      "SYSHIBA",
+      4,
+      10000000000000
+    ],
+    "0x88b360da1C27E7adBFFcD594Ba99a372aBe40421": [
+      "test",
+      "test",
+      4,
+      10000000000000
+    ],
+    "0x8aF8B25A42f034a6c1BAA05ff15114dD482B85F5": [
+      "SHYB",
+      "SYSHIBA",
+      9,
+      1000000000000000000000000000
+    ],
+    "0x922D641a426DcFFaeF11680e5358F34d97d112E1": [
+      "USDT",
+      "Tether USD",
+      6,
+      84782686770
+    ],
+    "0xa338e24926e4FA099a565EfB18374B3592A37662": [
+      "SYM",
+      "SYSMOON",
+      18,
+      10000000000000000000000000
+    ],
+    "0xa9a4f39252d5C57ce94ee62411E674e4e82c2064": [
+      "SMART",
+      "Smart Token",
+      4,
+      100000000000
+    ],
+    "0xB3d06b7d05969f806603702b084786e2ABe63460": [
+      "SUS",
+      "Suscoin",
+      18,
+      100000000000000000000000000
+    ],
+    "0xBbBEB0E02aFEA4D30340961E8E541054b91B668F": [
+      "UTTKE",
+      "Uttkoin",
+      18,
+      1000000000000000000000000
+    ],
+    "0xc8C124493Ab0F4A7A0442FAD2B05542879913A0F": [
+      "SMART",
+      "Smart Token",
+      4,
+      100000000
+    ],
+    "0xc9BAA8cfdDe8E328787E29b4B078abf2DaDc2055": [
+      "WBTC",
+      "Wrapped BTC",
+      8,
+      369448234
+    ],
+    "0xcc9dB24106CbA26F37A0e68B1b7300929269e640": [
+      "SMS",
+      "SMOON",
+      4,
+      10000000000000
+    ],
+    "0xd30234FC41b2312D58356f7E6948f6cd8e73cA42": [
+      "EWCL",
+      "EarnWithCryptoLooters",
+      18,
+      5000000000000000000
+    ],
+    "0xd3e822f3ef011Ca5f17D82C956D952D8d7C3A1BB": [
+      "WSYS",
+      "Wrapped SYS",
+      18,
+      4321490883842428702801901
+    ],
+    "0xE18c200A70908c89fFA18C628fE1B83aC0065EA4": [
+      "PSYS",
+      "Pegasys",
+      18,
+      100000000000000000000000000
+    ],
+    "0xe865bA5FEE807dCCD41A669A51aD5F3a7467C47E": [
+      "CIS",
+      "Ciscoin",
+      18,
+      888000000000000000000000000
+    ],
+    "0xeFAeeE334F0Fd1712f9a8cc375f427D9Cdd40d73": [
+      "DAI",
+      "Dai Stablecoin",
+      18,
+      16865076022900186884663
+    ],
+    "0xf27Ee99622C3C9b264583dACB2cCE056e194494f": [
+      "BNB",
+      "Binance",
+      18,
+      44591088586618668147
+    ],
+    "0xfdB9d2D0904F0089EAC56a423EAC15731340fCaC": [
+      "test",
+      "test",
+      4,
+      10000000000000
+    ]
+  }
+}

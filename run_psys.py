@@ -8,7 +8,6 @@
 
 import logging
 import sys
-import time
 
 import pidfile
 
@@ -18,16 +17,18 @@ from web3.middleware import geth_poa_middleware
 from sqlalchemy import select
 
 import xquery.cache
-import xquery.contract
 import xquery.controller
 import xquery.db
 import xquery.db.orm as orm
-import xquery.event.filter
-import xquery.event.indexer
-from xquery.provider import BatchHTTPProvider
-from xquery.middleware import http_backoff_retry_request_middleware
-
 from xquery.config import CONFIG as C
+from xquery.event import (
+    EventFilterExchangePegasys,
+    EventIndexerExchangePegasys,
+    EventProcessorExchangePegasys,
+)
+from xquery.contract import psys_factory
+from xquery.middleware import http_backoff_retry_request_middleware
+from xquery.provider import BatchHTTPProvider
 from xquery.util.misc import timeit
 
 log = logging.getLogger("main")
@@ -83,74 +84,45 @@ def main() -> int:
     cache.ping()
     cache.flush()
 
-    # factory contract
-    psys_factory = xquery.contract.psys_factory
-    contract_address = Web3.toChecksumAddress(psys_factory.address)
-
-    # load the indexer state
-    with db.session() as session:
-        state = session.execute(
-            select(orm.IndexerState)
-                .filter(orm.IndexerState.name == "default")
-        ).scalar()
-
-        # default
-        if state is None:
-            log.info(f"Creating new default indexer state for contract '{contract_address}'.")
-            state = orm.IndexerState(
-                name="default",
-                block_number=0,
-                block_hash=None,
-                discarded=False,
-            )
-            session.add(state)
-            session.commit()
-
-        # Note: we generally want 'expire_on_commit' except in this very specific case
-        # see: https://stackoverflow.com/questions/16907337/sqlalchemy-eager-loading-on-object-refresh
-        session.refresh(state)
-        session.expunge(state)
-
     # load pair addresses
     with db.session() as session:
         pairs = session.execute(
             select(orm.Pair)
         ).scalars().all()
 
-        pair_addresses = set([pair.address for pair in pairs])
+        pair_addresses = {pair.address for pair in pairs}
 
     # select the event indexer class/type
     # Note: will be instantiated in the worker process and therefore needs to be passed as type
-    indexer_cls = xquery.event.EventIndexerExchangePegasys
+    indexer_cls = EventIndexerExchangePegasys
 
     # create an event filter
-    event_filter = xquery.event.EventFilterExchangePegasys(
+    event_filter = EventFilterExchangePegasys(
         w3=w3,
         pair_addresses=pair_addresses,
     )
 
-    with xquery.controller.Controller(w3=w3, db=db, indexer_cls=indexer_cls, num_workers=int(C["XQ_NUM_WORKERS"])) as c:
-        start_block = max(psys_factory.from_block, state.block_number + 1)
+    # create an event processor
+    # Note: the actual processor stages will be instantiated in the worker process
+    event_processor = EventProcessorExchangePegasys()
 
-        # Run the scan
-        c.scan(
-            start_block=start_block,
+    with xquery.controller.Controller(w3=w3, db=db, indexer_cls=indexer_cls, num_workers=int(C["XQ_NUM_WORKERS"])) as c:
+        c.run(
+            start_block=psys_factory.from_block,
             end_block="latest",
             num_safety_blocks=5,
             filter_=event_filter,
+            processor=event_processor,
             chunk_size=2048,
-            max_chunk_size=2048,
+            target_sleep_time=300,
         )
-
-        # FIXME: workaround to give all worker processes enough time to fully initialize in the case of a short scan
-        time.sleep(5.0)
 
     return 0
 
 
 if __name__ == "__main__":
     try:
-        with pidfile.PIDFile("xquery.pid"):
+        with pidfile.PIDFile("xquery.psys.pid"):
             sys.exit(main())
     except pidfile.AlreadyRunningError:
         print("Already running. Exiting.")

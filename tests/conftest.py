@@ -18,6 +18,8 @@ from alembic.script import ScriptDirectory
 from alembic.runtime.environment import EnvironmentContext
 from alembic import autogenerate
 
+from sqlalchemy import event
+
 from web3 import Web3
 from web3.middleware import geth_poa_middleware
 
@@ -71,12 +73,18 @@ def db() -> xquery.db.FusionSQL:
 @pytest.fixture(scope="session")
 def dbm() -> xquery.db.FusionSQL:
     """
-    In-memory sqlite database for testing
+    In-memory SQlite database for testing
     """
     db = xquery.db.FusionSQL(
         conn="sqlite:///:memory:",
         verbose=C["DB_DEBUG"],
     )
+
+    # Note: SQlite doesn't have the concept of schemata as found in postgres.
+    #       However, we can work around it by attaching another external database.
+    @event.listens_for(db._engine, "first_connect")
+    def schema_attach(dbapi_connection, connection_record) -> None:
+        dbapi_connection.execute(f"ATTACH DATABASE ':memory:' AS {orm.Base.metadata.schema}")
 
     # initialize the database (create tables)
     with tempfile.TemporaryDirectory() as tmpdir:

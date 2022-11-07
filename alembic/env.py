@@ -18,7 +18,10 @@ from logging.config import fileConfig
 from sqlalchemy import create_engine
 from sqlalchemy import pool
 
-from alembic import context
+from alembic import (
+    context,
+    operations,
+)
 
 import xquery.db.orm as orm
 from xquery.db.misc import build_url
@@ -50,7 +53,8 @@ def get_url() -> str:
 
 
 def run_migrations_offline() -> None:
-    """Run migrations in 'offline' mode.
+    """
+    Run migrations in 'offline' mode.
 
     This configures the context with just a URL
     and not an Engine, though an Engine is acceptable
@@ -73,8 +77,28 @@ def run_migrations_offline() -> None:
         context.run_migrations()
 
 
+def _process_revision_directives(context, revision, directives) -> None:
+    """
+    Modify the ``MigrationScript`` directives to create schemata as required.
+
+    See: https://stackoverflow.com/a/70571077/14834858
+
+    :param context: the ``MigrationContext`` in use
+    :param revision: tuple of revision identifiers representing the current revision of the database
+    :param directives: list containing a single ``MigrationScript`` directive
+    :return:
+    """
+    assert len(directives) == 1
+
+    script = directives[0]
+    for schema in frozenset(i.schema for i in target_metadata.tables.values()):
+        script.upgrade_ops.ops.insert(0, operations.ops.ExecuteSQLOp(f"CREATE SCHEMA IF NOT EXISTS {schema}"))
+        script.downgrade_ops.ops.append(operations.ops.ExecuteSQLOp(f"DROP SCHEMA IF EXISTS {schema} RESTRICT"))
+
+
 def run_migrations_online() -> None:
-    """Run migrations in 'online' mode.
+    """
+    Run migrations in 'online' mode.
 
     In this scenario we need to create an Engine
     and associate a connection with the context.
@@ -88,7 +112,9 @@ def run_migrations_online() -> None:
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, target_metadata=target_metadata
+            connection=connection,
+            target_metadata=target_metadata,
+            process_revision_directives=_process_revision_directives,
         )
 
         with context.begin_transaction():

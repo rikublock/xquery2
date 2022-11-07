@@ -10,38 +10,49 @@ from typing import (
     Any,
     Dict,
     List,
+    Tuple,
+    Type,
     Union,
 )
 
+import enum
 from dataclasses import dataclass
 
 import xquery.db.orm as orm
+from xquery.event.processor import ComputeInterval
 from xquery.types import ExtendedLogReceipt
 
 
 @dataclass
 class DataBundle(object):
     """
-    Used to efficiently package data for indexer workers in a coherent way.
-    The structure is used transport data in ``Job`` and ``JobResult``.
+    Used to efficiently package data for workers in a coherent way.
+    The structure is used to transport data in both ``Job`` and ``JobResult``.
 
     Attributes:
         objects: data being transported between processes
         meta: optional metadata detailing additional properties of ``objects``
     """
-    objects: List[Union[ExtendedLogReceipt, List[orm.BaseModel]]]
+    objects: List[Union[ExtendedLogReceipt, ComputeInterval, List[orm.Base], List[Tuple[Type[orm.Base], List[dict]]]]]
     meta: Dict[str, Any] = None
+
+
+class JobType(enum.Enum):
+    Index = 0
+    Process = enum.auto()
 
 
 @dataclass
 class Job(object):
     """
-    Contains the necessary job data for an indexer worker.
+    Contains the necessary job data for a worker.
 
-    Should contain bundled objects of type ``ExtendedLogReceipt``.
+    Should contain bundled objects of type ``ExtendedLogReceipt`` and ``ComputeInterval``
+    in case of an indexer and processor worker, respectively.
 
     Note: The unique job id is used to sort results and ensure all jobs have been processed.
     Note: All event log entries from one block are expected to be "bundled" together.
+    Note: Objects are expected to be sorted in ascending order.
 
     Example:
         DataBundle(
@@ -51,6 +62,7 @@ class Job(object):
                 event3,
             ],
             meta={
+                "state_name": "indexer",
                 "block_number": 57347,
                 "block_hash": "0x8ed42786cb8fa0aa8ef0121cfc50b7e23277d513b5f4486078141a9f540d982b",
             }
@@ -58,9 +70,11 @@ class Job(object):
 
     Attributes:
         id: unique, consecutive identifier
+        type: job type
         data: bundled job data
     """
     id: int
+    type: JobType
     data: List[DataBundle]
 
     def __repr__(self) -> str:
@@ -70,20 +84,21 @@ class Job(object):
 @dataclass
 class JobResult(object):
     """
-    Contains the result data of a job from an indexer worker.
+    Contains the result data of a job that was fully processed by a worker.
 
-    Should contain bundled objects of type ``List[orm.BaseModel]``.
+    Should contain bundled objects of type ``List[orm.Base]`` or ``List[Tuple[Type[orm.Base], List[dict]]]``.
 
-    Note: The unique result id has to always match the id from the corresponding job.
+    Note: The unique result id has to always match the id of the corresponding job.
     Note: All event log entries from a block are expected to be "bundled" together.
     Note: A single event can generate a list (multiple) of orm objects.
+    Note: Objects are expected to follow the same order found in the corresponding job.
 
     Example:
         DataBundle(
             objects=[
-                [orm_obj1, orm_obj2],  # from event1
-                [orm_obj3],
-                [orm_obj4, orm_obj5, orm_obj6],
+                [orm_obj1, orm_obj2],            # from event1
+                [orm_obj3],                      # from event2
+                [orm_obj4, orm_obj5, orm_obj6],  # from event3
             ],
             meta={
                 "block_number": 57347,
@@ -93,7 +108,12 @@ class JobResult(object):
 
     Attributes:
         id: unique, consecutive identifier
+        type: job type
         data: bundled result data
     """
     id: int
+    type: JobType
     data: List[DataBundle]
+
+    def __repr__(self) -> str:
+        return f"JobResult(id={self.id} type={self.type})"

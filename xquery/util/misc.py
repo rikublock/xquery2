@@ -6,7 +6,11 @@
 #
 # This file is part of XQuery2.
 
-from typing import Any
+from typing import (
+    Any,
+    List,
+    Tuple,
+)
 
 import hashlib
 import itertools
@@ -65,6 +69,59 @@ def batched(a: list, size: int = 8) -> list:
     """
     for i in range(0, len(a), size):
         yield a[i:i + size]
+
+
+def intervaled(start: int, stop: int, size: int) -> Tuple[int, int]:
+    """
+    Yield successive evenly-sized intervals from a given range
+
+    :param start: first element
+    :param stop: last element
+    :param size: chunk size
+    :return:
+    """
+    assert start <= stop
+
+    it = start
+    while it <= stop:
+        yield it, min(stop, it + size - 1)
+        it += size
+
+
+def split_interval(a: int, b: int, values: List[int]) -> List[Tuple[int, int]]:
+    """
+    Split an integer interval [a, b] into several sub intervals according to a list of split values
+
+    Note: Any split value outside of the interval will simply be ignored
+
+    Example:
+    interval [1, 8]; values (4, 7) -> [1, 4], [5, 7], [8, 8]
+
+    :param a: first element (included in the interval)
+    :param b: last element (included in the interval)
+    :param values: split points
+    :return:
+    """
+    c = a
+    intervals = []
+    for p in sorted(set(values)):
+        # handle edge cases
+        if p < a:
+            continue
+        if p > b:
+            break
+
+        # p inside interval
+        assert a <= p <= b
+        if p < b:
+            intervals.append((c, p))
+            c = p + 1
+
+    # collect remaining elements
+    if c <= b:
+        intervals.append((c, b))
+
+    return intervals
 
 
 def convert(value: Any) -> Any:

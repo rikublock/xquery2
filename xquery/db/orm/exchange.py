@@ -6,45 +6,23 @@
 #
 # This file is part of XQuery2.
 
-import enum
-
 from sqlalchemy import (
     Boolean,
     Column,
-    Enum,
     Integer,
     SmallInteger,
     String,
     Numeric,
-    Table,
+    CheckConstraint,
     ForeignKey,
     UniqueConstraint,
-    CheckConstraint,
 )
-from sqlalchemy.orm import (
-    relationship,
-    backref,
-)
+from sqlalchemy.orm import relationship
 
 from .base import (
     Base,
     BaseModel,
 )
-
-# TODO craete a blocks model, then just add relationship
-# block should contain: chain, hash, height, timestamp
-
-
-# Deviations
-# UniswapFactory -> Factory
-# Factory.id -> Factory.address
-# Factory.totalVolumeETH -> Factory.totalVolumeNative
-# Factory.totalLiquidityETH -> Factory.totalLiquidityNative
-# Token.id -> Token.address
-# Token.derivedETH -> Token.derivedNative
-# Pair.id -> Pair.address
-# TODO
-
 
 
 class Factory(BaseModel, Base):
@@ -123,6 +101,7 @@ class Pair(BaseModel, Base):
 
     Relationships
         - ManyToOne with Tokens
+        - OneToMany with Block
     """
     __tablename__ = "pair"
 
@@ -138,6 +117,7 @@ class Pair(BaseModel, Base):
 
     # Constraints
     UniqueConstraint(token0_address, token1_address)
+    CheckConstraint(token0_address != token1_address, name="pair_unequal_token_address")
 
     reserve0 = Column(Numeric(precision=78, scale=0), nullable=False)
     reserve1 = Column(Numeric(precision=78, scale=0), nullable=False)
@@ -207,7 +187,7 @@ class LiquidityPosition(BaseModel, Base):
     __tablename__ = "liquidity_position"
 
     user_id = Column(Integer, ForeignKey("user.id"))
-    user = relationship("User", back_populates="liquidityPositions")
+    user = relationship("User", back_populates="liquidityPositions", foreign_keys=[user_id])
 
     pair_address = Column(String(length=42), ForeignKey("pair.address"))
     pair = relationship("Pair", back_populates="liquidityPositions", foreign_keys=[pair_address])
@@ -227,7 +207,6 @@ class LiquidityPositionSnapshot(BaseModel, Base):
     """
     __tablename__ = "liquidity_position_snapshot"
 
-    # TODO saved for fast historical lookups (block contains timestamp)
     block_id = Column(Integer, ForeignKey("block.id"))
     block = relationship("Block", foreign_keys=[block_id])
 
@@ -282,7 +261,7 @@ class Transaction(BaseModel, Base):
     __tablename__ = "transaction"
 
     hash = Column(String(length=66), nullable=False, unique=True)
-    from_ = Column(String(length=42), nullable=False)
+    from_ = Column("from", String(length=42), nullable=False)
 
     # Relationships to other tables
     block_id = Column(Integer, ForeignKey("block.id"))
@@ -296,7 +275,7 @@ class Transfer(BaseModel, Base):
     """
     Store Transfer event information
 
-    Only used to store information for later post-processing.
+    Only used to temporarily store information for post-processing.
 
     Relationships
         - OneToMany with Pair
@@ -309,7 +288,7 @@ class Transfer(BaseModel, Base):
     pair_address = Column(String(length=42), ForeignKey("pair.address"))
     pair = relationship("Pair", foreign_keys=[pair_address])
 
-    from_ = Column(String(length=42), nullable=False)
+    from_ = Column("from", String(length=42), nullable=False)
     to = Column(String(length=42), nullable=False)
     value = Column(Numeric(precision=78, scale=18), nullable=False)
     logIndex = Column(Integer, nullable=False)
@@ -323,15 +302,14 @@ class Mint(BaseModel, Base):
     """
     __tablename__ = "mint"
 
-    # transaction hash + "-" + index in mints Transaction array
-    # identifier = Column(String(length=128), nullable=False, unique=True)
-
-    # TODO
     transaction_id = Column(Integer, ForeignKey("transaction.id"))
     transaction = relationship("Transaction", foreign_keys=[transaction_id])
 
     pair_address = Column(String(length=42), ForeignKey("pair.address"))
     pair = relationship("Pair", back_populates="mints", foreign_keys=[pair_address])
+
+    # legacy
+    timestamp = Column(Integer, nullable=False)
 
     # populated from the primary Transfer event
     liquidity = Column(Numeric(precision=78, scale=18), nullable=False)
@@ -357,11 +335,11 @@ class Burn(BaseModel, Base):
     """
     __tablename__ = "burn"
 
-    # transaction hash + "-" + index in burns Transaction array
-    # identifier = Column(String(length=128), nullable=False, unique=True)
-
     transaction_id = Column(Integer, ForeignKey("transaction.id"))
     transaction = relationship("Transaction", foreign_keys=[transaction_id])
+
+    # legacy
+    timestamp = Column(Integer, nullable=False)
 
     pair_address = Column(String(length=42), ForeignKey("pair.address"))
     pair = relationship("Pair", back_populates="burns", foreign_keys=[pair_address])
@@ -373,7 +351,7 @@ class Burn(BaseModel, Base):
     sender = Column(String(length=42))
     amount0 = Column(Numeric(precision=78, scale=18))
     amount1 = Column(Numeric(precision=78, scale=18))
-    to = Column(String(length=42), nullable=False)
+    to = Column(String(length=42))
     logIndex = Column(Integer)
     # derived amount based on available prices of tokens
     amountUSD = Column(Numeric(precision=78, scale=18))
@@ -394,18 +372,18 @@ class Swap(BaseModel, Base):
     """
     __tablename__ = "swap"
 
-    # transaction hash + "-" + index in swaps Transaction array
-    # identifier = Column(String(length=128), nullable=False, unique=True)
-
     transaction_id = Column(Integer, ForeignKey("transaction.id"))
     transaction = relationship("Transaction", foreign_keys=[transaction_id])
 
     pair_address = Column(String(length=42), ForeignKey("pair.address"))
     pair = relationship("Pair", back_populates="swaps", foreign_keys=[pair_address])
 
+    # legacy
+    timestamp = Column(Integer, nullable=False)
+
     # populated from the Swap event
     sender = Column(String(length=42), nullable=False)
-    from_ = Column(String(length=42), nullable=False)  # the EOA that initiated the txn
+    from_ = Column("from", String(length=42), nullable=False)  # the EOA that initiated the txn
     amount0In = Column(Numeric(precision=78, scale=18), nullable=False)
     amount1In = Column(Numeric(precision=78, scale=18), nullable=False)
     amount0Out = Column(Numeric(precision=78, scale=18), nullable=False)
@@ -421,7 +399,7 @@ class Sync(BaseModel, Base):
     """
     Store Sync event information
 
-    Only used to store information for later post-processing.
+    Only used to temporarily store information for post-processing.
 
     Relationships
         - OneToMany with Pair
@@ -444,18 +422,19 @@ class Bundle(BaseModel, Base):
     Store USD calculations information
 
     Relationships
+        - OneToMany with Block
     """
     __tablename__ = "bundle"
 
-    # using BaseModel.id as identifier
-
-    # price of Native to USD
+    # price of Native in USD
     nativePrice = Column(Numeric(precision=78, scale=18), nullable=False)
 
     block_id = Column(Integer, ForeignKey("block.id"))
     block = relationship("Block", foreign_keys=[block_id])
 
     logIndex = Column(Integer)
+
+    UniqueConstraint(block_id, logIndex)
 
 
 class ExchangeDayData(BaseModel, Base):
@@ -491,8 +470,6 @@ class PairHourData(BaseModel, Base):
     """
     __tablename__ = "pair_hour_data"
 
-    # using BaseModel.id as identifier
-
     # unix timestamp for start of hour
     hourStartUnix = Column(Integer, nullable=False)
 
@@ -523,8 +500,6 @@ class PairDayData(BaseModel, Base):
     Relationships
     """
     __tablename__ = "pair_day_data"
-
-    # using BaseModel.id as identifier
 
     date = Column(Integer, nullable=False)
     pairAddress = Column(String(length=42), nullable=False)  # TODO use relationship ?
@@ -559,8 +534,6 @@ class TokenDayData(BaseModel, Base):
     Relationships
     """
     __tablename__ = "token_day_data"
-
-    # using BaseModel.id as identifier
 
     date = Column(Integer, nullable=False)
 

@@ -63,7 +63,8 @@ def main() -> int:
     # load any table to ensure the models were migrated
     with db.session() as session:
         session.execute(
-            select(orm.IndexerState)
+            select(orm.State)
+                .limit(1)
         ).scalar()
 
     # check cache

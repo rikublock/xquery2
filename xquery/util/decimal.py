@@ -31,6 +31,11 @@ from decimal import (
 log = logging.getLogger(__name__)
 
 
+# Note: This number arises from the types used in the current database models.
+#       It cannot simply be changed by itself here.
+MAX_DECIMAL_PLACES = 18
+
+
 def init_decimal_context() -> None:
     """
     Configure the decimal module context
@@ -66,4 +71,4 @@ def token_to_decimal(value: Union[int, Decimal], exp: Union[int, Decimal]) -> De
     :return:
     """
     v = Decimal(value) / (Decimal("10") ** Decimal(exp))
-    return v.quantize(Decimal(f"0.{18 * '0'}"), rounding=ROUND_HALF_UP)
+    return v.quantize(Decimal(f"0.{MAX_DECIMAL_PLACES * '0'}"), rounding=ROUND_HALF_UP)

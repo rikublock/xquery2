@@ -10,32 +10,6 @@
 - running Redis server
 - running Web3 enabled node (ETH, AVAX, etc.)
 
-### Build Python 3.10 (not yet supported)
-
-```shell
-sudo apt install build-essential gdb lcov pkg-config \
-      libbz2-dev libffi-dev libgdbm-dev libgdbm-compat-dev liblzma-dev \
-      libncurses5-dev libreadline6-dev libsqlite3-dev libssl-dev \
-      lzma lzma-dev tk-dev uuid-dev zlib1g-dev
-```
-
-```shell
-mkdir /tmp/python && cd "$_"
-
-# pull Python source
-wget https://www.python.org/ftp/python/3.10.5/Python-3.10.5.tar.xz
-tar xvf Python-3.*.tar.xz
-cd Python-3.*/
-
-# build 
-./configure --enable-optimizations
-make -j $(nproc)
-
-# install 
-# Note: `make install` can overwrite or masquerade the python3 binary. `make altinstall` is therefore recommended
-sudo make altinstall
-```
-
 ### Virtual Environment
 
 ```shell
@@ -49,20 +23,11 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-For Python 3.10 use (not yet supported):
-```shell
-/usr/local/bin/python3.10 -m venv ./.venv
-source .venv/bin/activate
-
-pip install -U setuptools
-pip install -r requirements.txt
-```
-
 > XQuery requires the `psycopg2` python package, which is compiled from source and thus has 
 > additional system prerequisites (C compiler, system dev packages).
-> See [here](https://www.psycopg.org/docs/install.html#install-from-source).
+> Details can be found [here](https://www.psycopg.org/docs/install.html#install-from-source).
 
-The required system packages can be install with:
+The required system packages can be installed with:
 ```shell
 sudo apt install build-essential python3-dev libpq-dev gcc
 ```
@@ -105,7 +70,8 @@ CONFIG = {
 
 ### Database
 
-Run the following commands to first create a migration and then apply it (create database tables).
+Run the following commands to first create a migration file in `alembic/versions/` and then apply it (create database tables).
+More detailed documentation can be found [here](https://alembic.sqlalchemy.org/en/latest/tutorial.html#create-a-migration-script).
 
 ```shell
 alembic -n default -c alembic/alembic.ini revision --autogenerate -m 'creating schema'
@@ -114,24 +80,81 @@ alembic -n default -c alembic/alembic.ini upgrade head
 
 ### Verify Setup
 
-Optionally, test the environment and configuration:
+Optionally, test the environment and configuration (should complete without any errors):
 
 ```shell
 python -m test_setup
 ```
 
-## Run Example
+## Run
 
-Run one of the preconfigured examples, Pangolin (PNG) Exchange on Avalanche or Pegasys (PSYS) Exchange on Syscoin:
+### Basic Example
+
+Run one of the preconfigured examples, Pangolin (PNG) Exchange on Avalanche (AVAX) or 
+Pegasys (PSYS) Exchange on Syscoin (SYS):
 
 ```shell
 python -m run_png
 python -m run_psys
 ```
 
+### Run Multiple Instances Simultaneously 
+
+Concurrent instances of XQuery can be run in two different configurations. 
+- Run a full stack for each instance (including a separate database with the default schema)
+- Make use of the same database server, but create a separate schema for each instance
+
+The latter is outlined in detail in the following section (can be adapted for any number instances).
+
+Create a separate database schema for each XGraph by specifying the `DB_SCHEMA` env variable. 
+This can be achieved by first creating two migrations and then applying them to the database:
+
+```shell
+DB_SCHEMA="xgraph_png" alembic -n default -c alembic/alembic.ini revision --autogenerate -m 'creating schema for Pangolin'
+alembic -n default -c alembic/alembic.ini upgrade head
+```
+
+```shell
+DB_SCHEMA="xgraph_psys" alembic -n default -c alembic/alembic.ini revision --autogenerate -m 'creating schema for Pegasys'
+alembic -n default -c alembic/alembic.ini upgrade head
+```
+
+Once the necessary database structures have been created run each of the following lines in a separate terminal
+in order to launch two simultaneous instances of XQuery:
+
+```shell
+DB_SCHEMA="xgraph_png" API_URL="http://localhost:9650/ext/bc/C/rpc" REDIS_DATABASE=0 python -m run_png
+DB_SCHEMA="xgraph_psys" API_URL="http://localhost:8545/" REDIS_DATABASE=1 python -m run_psys
+```
+
+### Shutdown
+
+The XQuery main process can handle the `SIGINT` (interrupt) and `SIGTERM` (terminate) POSIX signals. 
+Both these signals can be used to initiate a graceful shutdown (might take several minutes). 
+
+> Worker processes are fully managed by the main process and should never be terminated manually. 
+> Doing so can lead to unrecoverable errors.
+
+## Implement an XGraph
+
+An XGraph consists of the following elements: An event `filter`, `indexer` and `processor` as well as an 
+`orm` (object relational mapping) of the relevant tables.
+
+- `filter`: Should inherit from the `EventFilter` base class and implement the necessary abstract methods.
+- `indexer`: Should inherit from the `EventIndexer` base class and implement the necessary abstract methods.
+- `processor`: Should inherit from either the `EventProcessor` or `EventProcessorStage`base class and implement
+the necessary abstract methods. Depending on the complexity of the XGraph, the computation/processing might 
+require multiple stages.
+- `orm`: Any table should inherit from the `Base` (and optionally `BaseModel`) base class.
+
+For more detailed documentation as well as assumptions/restrictions/responsibilities see the in code 
+class descriptions. The relevant files can be found in `event/` and `db/orm/`.
+
+The XGraph implementations for the Pangolin and Pegasys exchanges can serve as a reference.
+
 ## Tests
 
-> WARNING: Some tests currently affect the state of the cache and database. Only run on a development setup!
+> WARNING: Some tests affect the state of the cache and database. Only run on a development setup!
 
 > Some tests only run on Avalanche (AVAX) currently
 
@@ -142,9 +165,13 @@ pytest -v tests/
 pytest -v -rP tests/
 
 pytest -v -k="cache" tests/
+pytest -v -k="dbm" tests/
+pytest -v -k="decimal" tests/
 pytest -v -k="filter" tests/
 pytest -v -k="indexer" tests/
+pytest -v -k="interval" tests/
 pytest -v -k="middleware" tests/
+pytest -v -k="processor" tests/
 ```
 
 ## Benchmarks

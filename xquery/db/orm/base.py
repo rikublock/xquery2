@@ -8,16 +8,22 @@
 
 import datetime
 
-from sqlalchemy.orm import declarative_base
 from sqlalchemy import (
     Boolean,
     Column,
     DateTime,
     Integer,
+    MetaData,
 )
+from sqlalchemy.orm import declarative_base
 
+from xquery.config import CONFIG as C
 
-Base = declarative_base()
+Base = declarative_base(
+    metadata=MetaData(
+        schema=C["DB_SCHEMA"],
+    ),
+)
 
 
 class BaseModel(object):

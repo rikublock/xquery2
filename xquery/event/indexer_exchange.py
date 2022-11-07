@@ -40,10 +40,22 @@ from eth_typing import (
 )
 
 import xquery.cache
-import xquery.contract
+import xquery.db
 import xquery.db.orm as orm
+from xquery.contract import (
+    png_factory,
+    png_rc20,
+    png_router,
+    psys_factory,
+    psys_rc20,
+    psys_router,
+    rc20_bytes,
+)
 from xquery.types import ExtendedLogReceipt
-from xquery.util import token_to_decimal
+from xquery.util import (
+    MAX_DECIMAL_PLACES,
+    token_to_decimal,
+)
 from .indexer import EventIndexer
 
 log = logging.getLogger(__name__)
@@ -93,9 +105,8 @@ class EventIndexerExchange(EventIndexer):
         :param factory_address: factory contract checksum address of the exchange
         :param router_address: router contract checksum address of the exchange
         """
-        self._w3 = w3
-        self._db = db
-        self._cache = cache
+        super().__init__(w3, db, cache)
+
         self._abi_rc20 = abi_rc20
         self._factory_address = factory_address
         self._router_address = router_address
@@ -116,13 +127,13 @@ class EventIndexerExchange(EventIndexer):
         # sanity checks
         for tx_hash, mints in self._mints.items():
             for mint in mints:
-                assert is_complete(mint)
+                if not is_complete(mint):
+                    log.warning(f"Encountered incomplete mint event in tx '{tx_hash}'")
 
         for tx_hash, burns in self._burns.items():
             for burn in burns:
-                # assert not burn.needsComplete
                 if burn.needsComplete:
-                    log.warning(f"Encountered incomplete burn event (tx.id {burn.transaction_id})")
+                    log.warning(f"Encountered incomplete burn event in tx '{tx_hash}'")
 
         self._mints = {}
         self._burns = {}
@@ -305,6 +316,7 @@ class EventIndexerExchange(EventIndexer):
         """
         Get a factory object
 
+        :param address: factory contract address
         :return:
         """
         address = Web3.toChecksumAddress(address)
@@ -360,11 +372,9 @@ class EventIndexerExchange(EventIndexer):
         :param address: RC20 token contract address
         :return:
         """
-        abi_rc20_bytes = xquery.contract.rc20_bytes.abi
-
         address = Web3.toChecksumAddress(address)
         contract = self._w3.eth.contract(address=address, abi=self._abi_rc20)
-        contract_bytes = self._w3.eth.contract(address=address, abi=abi_rc20_bytes)
+        contract_bytes = self._w3.eth.contract(address=address, abi=rc20_bytes.abi)
 
         # TODO convert to batch request
 
@@ -443,7 +453,7 @@ class EventIndexerExchange(EventIndexer):
                     symbol, name, decimals, total_supply = self._fetch_token_info(address)
 
                     # TODO Currently we cannot handle more digits (underlying db data type)
-                    assert decimals <= 18
+                    assert decimals <= MAX_DECIMAL_PLACES
 
                     token = orm.Token(
                         address=address,
@@ -574,7 +584,7 @@ class EventIndexerExchange(EventIndexer):
         else:
             return pair
 
-    def _handle_pair_created(self, entry: ExtendedLogReceipt) -> List[orm.BaseModel]:
+    def _handle_pair_created(self, entry: ExtendedLogReceipt) -> List[orm.Base]:
         """
         Process a ``PairCreated`` event (factory contract)
 
@@ -647,7 +657,7 @@ class EventIndexerExchange(EventIndexer):
 
         return [pair]
 
-    def _handle_transfer(self, entry: ExtendedLogReceipt) -> List[orm.BaseModel]:
+    def _handle_transfer(self, entry: ExtendedLogReceipt) -> List[orm.Base]:
         """
         Process a ``Transfer`` event (pair contract)
 
@@ -718,6 +728,7 @@ class EventIndexerExchange(EventIndexer):
                 mint = orm.Mint(
                     transaction_id=tx.id,
                     pair_address=Web3.toChecksumAddress(entry.address),
+                    timestamp=tx.timestamp,
                     liquidity=value,
                     sender=None,
                     amount0=Decimal("0"),
@@ -745,6 +756,7 @@ class EventIndexerExchange(EventIndexer):
             burn = orm.Burn(
                 transaction_id=tx.id,
                 pair_address=Web3.toChecksumAddress(entry.address),
+                timestamp=tx.timestamp,
                 liquidity=value,
                 sender=Web3.toChecksumAddress(args["from"]),
                 amount0=Decimal("0"),
@@ -771,6 +783,7 @@ class EventIndexerExchange(EventIndexer):
                 burn = orm.Burn(
                         transaction_id=tx.id,
                         pair_address=Web3.toChecksumAddress(entry.address),
+                        timestamp=tx.timestamp,
                         liquidity=value,
                         sender=None,
                         amount0=Decimal("0"),
@@ -813,7 +826,7 @@ class EventIndexerExchange(EventIndexer):
 
         return objects
 
-    def _handle_burn(self, entry: ExtendedLogReceipt) -> List[orm.BaseModel]:
+    def _handle_burn(self, entry: ExtendedLogReceipt) -> List[orm.Base]:
         """
         Process a ``Burn`` event (pair contract)
 
@@ -899,7 +912,7 @@ class EventIndexerExchange(EventIndexer):
 
         return [burn]
 
-    def _handle_mint(self, entry: ExtendedLogReceipt) -> List[orm.BaseModel]:
+    def _handle_mint(self, entry: ExtendedLogReceipt) -> List[orm.Base]:
         """
         Process a ``Mint`` event (pair contract)
 
@@ -962,7 +975,6 @@ class EventIndexerExchange(EventIndexer):
         mints = self._mints[tx.hash]
 
         assert len(mints) > 0
-        assert len(mints) == 1, tx.hash  # TODO find transaction with more than one mint event
         mint = mints[-1]
 
         mint.sender = Web3.toChecksumAddress(args.sender)
@@ -973,7 +985,7 @@ class EventIndexerExchange(EventIndexer):
 
         return [mint]
 
-    def _handle_swap(self, entry: ExtendedLogReceipt) -> List[orm.BaseModel]:
+    def _handle_swap(self, entry: ExtendedLogReceipt) -> List[orm.Base]:
         """
         Process a ``Swap`` event (pair contract)
 
@@ -1044,6 +1056,7 @@ class EventIndexerExchange(EventIndexer):
         swap = orm.Swap(
             transaction_id=tx.id,
             pair_address=Web3.toChecksumAddress(entry.address),
+            timestamp=tx.timestamp,
             sender=args.sender,
             from_=tx.from_,
             amount0In=amount0_in,
@@ -1057,7 +1070,7 @@ class EventIndexerExchange(EventIndexer):
 
         return [swap]
 
-    def _handle_sync(self, entry: ExtendedLogReceipt) -> List[orm.BaseModel]:
+    def _handle_sync(self, entry: ExtendedLogReceipt) -> List[orm.Base]:
         """
         Process a ``Sync`` event (pair contract)
 
@@ -1095,7 +1108,7 @@ class EventIndexerExchange(EventIndexer):
         token1 = self._get_token(pair.token1_address)
 
         reserve0 = token_to_decimal(args.reserve0, token0.decimals)
-        reserve1 = token_to_decimal(args.reserve0, token1.decimals)
+        reserve1 = token_to_decimal(args.reserve1, token1.decimals)
 
         sync = orm.Sync(
             transaction_id=tx.id,
@@ -1107,7 +1120,22 @@ class EventIndexerExchange(EventIndexer):
 
         return [sync]
 
-    def process(self, entry: ExtendedLogReceipt) -> List[orm.BaseModel]:
+    @classmethod
+    def setup(cls, w3: Web3, db: xquery.db.FusionSQL, start_block: int) -> List[orm.Base]:
+        try:
+            block_info = w3.eth.get_block(start_block)
+        except BlockNotFound:
+            raise
+
+        block = orm.Block(
+            hash=block_info.hash.hex(),
+            number=block_info.number,
+            timestamp=block_info.timestamp,
+        )
+
+        return [block]
+
+    def process(self, entry: ExtendedLogReceipt) -> List[orm.Base]:
         """
         Index an event log entry
 
@@ -1118,7 +1146,6 @@ class EventIndexerExchange(EventIndexer):
         assert not entry.removed
 
         objects = []
-
         if entry.name == "PairCreated":
             result = self._handle_pair_created(entry)
             objects.extend(result)
@@ -1152,10 +1179,6 @@ class EventIndexerExchangePangolin(EventIndexerExchange):
         # TODO
         # assert w3.eth.chain_id == int(orm.Chain.AVAX)
 
-        png_factory = xquery.contract.png_factory
-        png_router = xquery.contract.png_router
-        png_rc20 = xquery.contract.png_rc20
-
         super().__init__(
             w3=w3,
             db=db,
@@ -1174,10 +1197,6 @@ class EventIndexerExchangePegasys(EventIndexerExchange):
         """
         # TODO
         # assert w3.eth.chain_id == int(orm.Chain.SYS)
-
-        psys_factory = xquery.contract.psys_factory
-        psys_router = xquery.contract.psys_router
-        psys_rc20 = xquery.contract.psys_rc20
 
         super().__init__(
             w3=w3,

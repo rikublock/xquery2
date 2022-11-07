@@ -7,7 +7,6 @@
 # This file is part of XQuery2.
 
 from sqlalchemy import (
-    Boolean,
     Column,
     Integer,
     String,
@@ -19,29 +18,12 @@ from .base import (
 )
 
 
-class IndexerState(BaseModel, Base):
+class State(BaseModel, Base):
     """
-    Store indexer state information
-
-    Relationships
+    Basic state information
     """
-    __tablename__ = "indexer_state"
+    __tablename__ = "state"
 
     name = Column(String(length=128), unique=True, nullable=False)
-    block_number = Column(Integer, nullable=False)
-    block_hash = Column(String(length=66))
-    discarded = Column(Boolean)
-
-
-class ProcessorState(BaseModel, Base):
-    """
-    Store processor state information
-
-    Relationships
-    """
-    __tablename__ = "processor_state"
-
-    name = Column(String(length=128), unique=True, nullable=False)
-    stage = Column(Integer, unique=True, nullable=False)
-    block_number = Column(Integer, nullable=False)
+    block_number = Column(Integer)
     block_hash = Column(String(length=66))

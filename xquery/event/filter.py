@@ -40,7 +40,7 @@ class EventFilter(abc.ABC):
 
     def __init__(self, w3: Web3, events: list) -> None:
         """
-        Create filter and determine event topics.
+        Create event filter and determine event topics
 
         :param w3: web3 provider
         :param events: find and filter for these events

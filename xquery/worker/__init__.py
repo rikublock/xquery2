@@ -6,6 +6,6 @@
 #
 # This file is part of XQuery2.
 
-from .indexer import worker
+from .indexer import WorkerIndexer
 from .job import *
 from .processor import WorkerProcessor
