@@ -197,7 +197,7 @@ class EventProcessorStageExchange_Bundle(EventProcessorStage):
         with self._db.session() as session:
             block = session.execute(
                 select(orm.Block)
-                    .filter(orm.Block.number <= start_block)
+                    .filter(orm.Block.number < start_block)
                     .order_by(orm.Block.number.desc())
                     .limit(1)
             ).scalar()

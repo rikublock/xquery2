@@ -24,6 +24,11 @@ import signal
 import threading
 import time
 
+from requests.exceptions import (
+    HTTPError,
+    Timeout,
+)
+
 from sqlalchemy import select
 
 from web3 import Web3
@@ -472,6 +477,18 @@ class Controller(object):
 
         log.info("Terminating Database Handler")
 
+    def _estimate_next_chunk_size(self, current_chuck_size: int, count_logs: int) -> int:
+        """
+        Dynamically adjust the chunk_size depending on log entry density in the current
+        block chain section in order to minimize the number of API calls.
+
+        :param current_chuck_size: range of blocks scanned in the previous filter call
+        :param count_logs: number of event log entries found in the previous filter call
+        :return:
+        """
+        # TODO implement
+        return current_chuck_size
+
     def scan(
         self,
         start_block: BlockIdentifier,
@@ -571,31 +588,47 @@ class Controller(object):
         start_block = max(start_block, state_indexer.block_number + 1)
         end_block = min(end_block, latest_block - num_safety_blocks)
 
-        log.info(f"Starting scan ({start_block} to {end_block} with {num_safety_blocks} safety blocks)")
-
         # we are already done
         if start_block > end_block:
+            log.info(f"Skipping obsolete scan ({start_block} to {end_block})")
             return
 
-        current_block = start_block
-        current_chunk_size = min(chunk_size, end_block - current_block)
+        log.info(f"Starting scan ({start_block} to {end_block} with {num_safety_blocks} safety blocks)")
 
-        while current_block < end_block:
+        # Regarding chunk size:
+        # - a range of blocks always includes both the start and the end block
+        # - the range 4 to 6 (start 4, end 6) would scan a total of 3 blocks (4, 5 and 6)
+        # - the same range would translate to a chunk_size = end - start + 1 = 3 with starting block 4
+        current_block = start_block
+        current_chunk_size = min(chunk_size, end_block - current_block + 1)
+
+        while current_block <= end_block:
             if self._terminating_local.is_set():
                 break
 
-            # TODO needs logic to handle 'eth_getLogs' throttle errors
-            logs = filter_.get_logs(
-                from_block=current_block,
-                chunk_size=current_chunk_size,
-            )
+            # handle possible 'eth_getLogs' throttle errors
+            retries = 5
+            delay = 3.0
+            for i in range(retries):
+                try:
+                    logs = filter_.get_logs(
+                        from_block=current_block,
+                        chunk_size=current_chunk_size,
+                    )
+                except (HTTPError, Timeout):
+                    if i < retries - 1:
+                        current_chunk_size = max(1, current_chunk_size // 2)
+                        log.warning(f"Failed to fetch log entries. Reducing number of blocks to {current_chunk_size} and retrying in {delay:.2f}s.")
+                        time.sleep(delay)
+                    else:
+                        raise
 
             log.info(f"Fetched {len(logs)} log entries from {current_chunk_size} blocks ({current_block} to {current_block + current_chunk_size - 1})")
             log.debug(pprint.pformat([json.loads(Web3.toJSON(entry)) for entry in logs]))
 
-            # TODO dynamically change chunk_size depending on previously returned results to minimize API calls
             current_block += current_chunk_size
-            current_chunk_size = min(chunk_size, end_block - current_block)
+            current_chunk_size = self._estimate_next_chunk_size(current_chunk_size, len(logs))
+            current_chunk_size = min(current_chunk_size, end_block - current_block + 1)
 
             # group/bundle by block height
             # Note: will later be used to ensure a consistent database state (commit all logs per block at once)
@@ -724,6 +757,7 @@ class Controller(object):
 
             # we are already done
             if adjust_start_block > end_block:
+                log.info(f"Skipping up-to-date stage '{stage.name}' ({adjust_start_block} to {end_block})")
                 continue
 
             log.info(f"Processing stage '{stage.name}' ({adjust_start_block} to {end_block})")

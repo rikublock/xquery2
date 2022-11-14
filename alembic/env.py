@@ -6,13 +6,6 @@
 #
 # This file is part of XQuery2.
 
-# Note: this module only works with postgresql!
-# will cause errors when connecting to other database servers
-try:
-    import alembic_autogenerate_enums
-except:
-    pass
-
 from logging.config import fileConfig
 
 from sqlalchemy import create_engine

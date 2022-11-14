@@ -575,7 +575,7 @@ class EventIndexerExchange(EventIndexer):
                     else:
                         elapsed = time.time() - start
                         if elapsed > 0.2:
-                            log.warning(f"Waited {elapsed:0.4f}s for pair '{address}' orm object")
+                            log.debug(f"Waited {elapsed:0.4f}s for pair '{address}' orm object")
                         return pair
 
                 # timeout
@@ -1122,18 +1122,22 @@ class EventIndexerExchange(EventIndexer):
 
     @classmethod
     def setup(cls, w3: Web3, db: xquery.db.FusionSQL, start_block: int) -> List[orm.Base]:
-        try:
-            block_info = w3.eth.get_block(start_block)
-        except BlockNotFound:
-            raise
+        objects = []
+        for number in sorted({0, start_block}):
+            try:
+                block_info = w3.eth.get_block(number)
+            except BlockNotFound:
+                raise
 
-        block = orm.Block(
-            hash=block_info.hash.hex(),
-            number=block_info.number,
-            timestamp=block_info.timestamp,
-        )
+            block = orm.Block(
+                hash=block_info.hash.hex(),
+                number=block_info.number,
+                timestamp=block_info.timestamp,
+            )
 
-        return [block]
+            objects.append(block)
+
+        return objects
 
     def process(self, entry: ExtendedLogReceipt) -> List[orm.Base]:
         """

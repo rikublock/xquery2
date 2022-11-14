@@ -3,7 +3,7 @@ services:
 
   # redis
   xquery-redis:
-    image: redis:6
+    image: redis:7.0
     container_name: "${PROJECT_NAME}-redis"
     restart: unless-stopped
     tty: true

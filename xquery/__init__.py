@@ -6,6 +6,6 @@
 #
 # This file is part of XQuery2.
 
-__version__ = "2.0.0-alpha3"
+__version__ = "2.0.0-alpha4"
 __author__ = "Riku Block"
 __copyright__ = "Copyright (C) 2022-2022 Riku Block"
