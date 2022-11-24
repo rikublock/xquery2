@@ -341,11 +341,11 @@ class EventIndexerExchange(EventIndexer):
                     factory = orm.Factory(
                         address=address,
                         pairCount=0,
-                        totalVolumeUSD=0,
-                        totalVolumeNative=0,
-                        untrackedVolumeUSD=0,
-                        totalLiquidityUSD=0,
-                        totalLiquidityNative=0,
+                        totalVolumeUSD=Decimal(0),
+                        totalVolumeNative=Decimal(0),
+                        untrackedVolumeUSD=Decimal(0),
+                        totalLiquidityUSD=Decimal(0),
+                        totalLiquidityNative=Decimal(0),
                         txCount=0,
                     )
 
@@ -460,13 +460,13 @@ class EventIndexerExchange(EventIndexer):
                         symbol=symbol,
                         name=name,
                         decimals=decimals,
-                        totalSupply=total_supply,
-                        tradeVolume=0,
-                        tradeVolumeUSD=0,
-                        untrackedVolumeUSD=0,
+                        totalSupply=Decimal(total_supply),
+                        tradeVolume=Decimal(0),
+                        tradeVolumeUSD=Decimal(0),
+                        untrackedVolumeUSD=Decimal(0),
                         txCount=0,
-                        totalLiquidity=0,
-                        derivedNative=0,
+                        totalLiquidity=Decimal(0),
+                        derivedNative=Decimal(0),
                     )
 
                     session.add(token)
@@ -513,7 +513,7 @@ class EventIndexerExchange(EventIndexer):
                 if user is None:
                     user = orm.User(
                         address=address,
-                        usdSwapped=0,
+                        usdSwapped=Decimal(0),
                     )
 
                     session.add(user)
@@ -731,11 +731,11 @@ class EventIndexerExchange(EventIndexer):
                     timestamp=tx.timestamp,
                     liquidity=value,
                     sender=None,
-                    amount0=Decimal("0"),
-                    amount1=Decimal("0"),
+                    amount0=Decimal(0),
+                    amount1=Decimal(0),
                     to=Web3.toChecksumAddress(args.to),
                     logIndex=None,
-                    amountUSD=Decimal("0"),
+                    amountUSD=Decimal(0),
                     feeTo=None,
                     feeLiquidity=None,
                 )
@@ -759,11 +759,11 @@ class EventIndexerExchange(EventIndexer):
                 timestamp=tx.timestamp,
                 liquidity=value,
                 sender=Web3.toChecksumAddress(args["from"]),
-                amount0=Decimal("0"),
-                amount1=Decimal("0"),
+                amount0=Decimal(0),
+                amount1=Decimal(0),
                 to=Web3.toChecksumAddress(args.to),
                 logIndex=None,
-                amountUSD=Decimal("0"),
+                amountUSD=Decimal(0),
                 needsComplete=True,
                 feeTo=None,
                 feeLiquidity=None,
@@ -786,11 +786,11 @@ class EventIndexerExchange(EventIndexer):
                         timestamp=tx.timestamp,
                         liquidity=value,
                         sender=None,
-                        amount0=Decimal("0"),
-                        amount1=Decimal("0"),
+                        amount0=Decimal(0),
+                        amount1=Decimal(0),
                         to=None,
                         logIndex=None,
-                        amountUSD=Decimal("0"),
+                        amountUSD=Decimal(0),
                         needsComplete=False,
                         feeTo=None,
                         feeLiquidity=None,
@@ -908,7 +908,7 @@ class EventIndexerExchange(EventIndexer):
         burn.amount0 = token0_amount
         burn.amount1 = token1_amount
         burn.logIndex = entry.logIndex
-        burn.amountUSD = Decimal("0")
+        burn.amountUSD = Decimal(0)
 
         return [burn]
 
@@ -981,7 +981,7 @@ class EventIndexerExchange(EventIndexer):
         mint.amount0 = token0_amount
         mint.amount1 = token1_amount
         mint.logIndex = entry.logIndex
-        mint.amountUSD = Decimal("0")
+        mint.amountUSD = Decimal(0)
 
         return [mint]
 
@@ -1065,7 +1065,7 @@ class EventIndexerExchange(EventIndexer):
             amount1Out=amount1_out,
             to=dest,
             logIndex=entry.logIndex,
-            amountUSD=Decimal("0"),
+            amountUSD=Decimal(0),
         )
 
         return [swap]

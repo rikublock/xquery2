@@ -14,6 +14,7 @@ from typing import (
 )
 
 import logging
+from decimal import Decimal
 
 from sqlalchemy import select
 from sqlalchemy.sql import func
@@ -41,7 +42,11 @@ class EventProcessorStageExchange_Count(EventProcessorStage):
           - factory.pairCount
           - factory.txCount
           - pair.txCount
+          - pair.totalSupply
+          - pair.volumeToken0
+          - pair.volumeToken1
           - token.txCount
+          - token.tradeVolume
 
         Depends on:
           - None
@@ -59,6 +64,7 @@ class EventProcessorStageExchange_Count(EventProcessorStage):
         factory = session.execute(
             select(orm.Factory)
                 .filter(orm.Factory.address == self.factory_address)
+                .limit(1)
         ).scalar()
         assert factory is not None
 
@@ -104,29 +110,39 @@ class EventProcessorStageExchange_Count(EventProcessorStage):
         # sum (mint, burn, swap) between (start_block, end_block)
         objects = []
         for pair in pairs:
-            pair.txCount += (
-                session.query(func.count(orm.Mint.id))
+            mint_count, mint_value, mint_fee_value = (
+                session.query(func.count(orm.Mint.id), func.sum(orm.Mint.liquidity), func.sum(orm.Mint.feeLiquidity))
                     .filter(orm.Mint.pair_address == pair.address)
                     .join(orm.Transaction)
                     .join(orm.Block)
                     .filter(orm.Block.number.between(start_block, end_block))
-            ).scalar()
+            ).one()
+            pair.txCount += mint_count
+            pair.totalSupply += Decimal(0) if mint_value is None else mint_value
+            pair.totalSupply += Decimal(0) if mint_fee_value is None else mint_fee_value
 
-            pair.txCount += (
-                session.query(func.count(orm.Burn.id))
+            burn_count, burn_value, burn_fee_value = (
+                session.query(func.count(orm.Burn.id), func.sum(orm.Burn.liquidity), func.sum(orm.Burn.feeLiquidity))
                     .filter(orm.Burn.pair_address == pair.address)
                     .join(orm.Transaction)
                     .join(orm.Block)
                     .filter(orm.Block.number.between(start_block, end_block))
-            ).scalar()
+            ).one()
+            pair.txCount += burn_count
+            pair.totalSupply -= Decimal(0) if burn_value is None else burn_value
+            pair.totalSupply += Decimal(0) if burn_fee_value is None else burn_fee_value
+            assert pair.totalSupply >= Decimal(0)
 
-            pair.txCount += (
-                session.query(func.count(orm.Swap.id))
+            swap_count, swap_value0, swap_value1 = (
+                session.query(func.count(orm.Swap.id), func.sum(orm.Swap.amount0Out + orm.Swap.amount0In), func.sum(orm.Swap.amount1Out + orm.Swap.amount1In))
                     .filter(orm.Swap.pair_address == pair.address)
                     .join(orm.Transaction)
                     .join(orm.Block)
                     .filter(orm.Block.number.between(start_block, end_block))
-            ).scalar()
+            ).one()
+            pair.txCount += swap_count
+            pair.volumeToken0 += Decimal(0) if swap_value0 is None else swap_value0
+            pair.volumeToken1 += Decimal(0) if swap_value1 is None else swap_value1
 
             objects.append(pair)
 
@@ -160,21 +176,34 @@ class EventProcessorStageExchange_Count(EventProcessorStage):
                     .filter(orm.Block.number.between(start_block, end_block))
             ).scalar()
 
-            token.txCount += (
-                session.query(func.count(orm.Swap.id))
+            swap_count, swap_value = (
+                session.query(func.count(orm.Swap.id), func.sum(orm.Swap.amount0Out + orm.Swap.amount0In))
                     .join(orm.Pair)
-                    .filter((orm.Pair.token0_address == token.address) | (orm.Pair.token1_address == token.address))
+                    .filter(orm.Pair.token0_address == token.address)
                     .join(orm.Transaction)
                     .join(orm.Block)
                     .filter(orm.Block.number.between(start_block, end_block))
-            ).scalar()
+            ).one()
+            token.txCount += swap_count
+            token.tradeVolume += Decimal(0) if swap_value is None else swap_value
+
+            swap_count, swap_value = (
+                session.query(func.count(orm.Swap.id), func.sum(orm.Swap.amount1Out + orm.Swap.amount1In))
+                    .join(orm.Pair)
+                    .filter(orm.Pair.token1_address == token.address)
+                    .join(orm.Transaction)
+                    .join(orm.Block)
+                    .filter(orm.Block.number.between(start_block, end_block))
+            ).one()
+            token.txCount += swap_count
+            token.tradeVolume += Decimal(0) if swap_value is None else swap_value
 
             objects.append(token)
 
         return objects
 
     @classmethod
-    def setup(cls, db: xquery.db.FusionSQL, start_block: int) -> Union[List[orm.Base], List[Tuple[Type[orm.Base], List[dict]]]]:
+    def setup(cls, db: xquery.db.FusionSQL, first_block: int) -> Union[List[orm.Base], List[Tuple[Type[orm.Base], List[dict]]]]:
         return []
 
     def process(self, start_block: int, end_block: int) -> Union[List[orm.Base], List[Tuple[Type[orm.Base], List[dict]]]]:

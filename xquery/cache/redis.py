@@ -39,11 +39,11 @@ class Cache_Redis(Cache):
     def set(self, name: TKey, value: TValue, ttl: Optional[int] = None) -> Any:
         self._redis.set(name, pickle.dumps(value, protocol=5), ex=ttl)
 
-    def get(self, name: TKey) -> Any:
+    def get(self, name: TKey, default: Any = None) -> Any:
         try:
             return pickle.loads(self._redis.get(name))
         except TypeError:
-            return None
+            return default
 
     def remove(self, name: TKey) -> Any:
         self._redis.delete(name)

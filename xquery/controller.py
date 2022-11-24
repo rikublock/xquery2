@@ -35,9 +35,12 @@ from web3 import Web3
 from web3.exceptions import BlockNotFound
 from web3.types import BlockIdentifier
 
-import xquery.cache
-import xquery.db
 import xquery.db.orm as orm
+from xquery.cache import (
+    Cache,
+    Cache_Memory,
+)
+from xquery.db import FusionSQL
 from xquery.event import (
     ComputeInterval,
     EventFilter,
@@ -131,23 +134,33 @@ class Controller(object):
 
     MAX_RESULT_STORAGE_SIZE = 1000
 
-    def __init__(self, w3: Web3, db: xquery.db.FusionSQL, indexer_cls: Type[EventIndexer], num_workers: int = None) -> None:
+    def __init__(self, w3: Web3, db: FusionSQL, cache: Cache, indexer_cls: Type[EventIndexer], num_workers: int = None) -> None:
         """
         The core of XQuery. Manages threads and worker processes.
 
         :param w3: web3 provider
         :param db: database service
+        :param cache: cache service
         :param indexer_cls: event indexer class used to process event log entries
         :param num_workers: Number of worker processes to use. If None, the number returned by os.cpu_count() is used.
         """
         self._w3 = w3
-
-        # Note: Currently shared between MainThread and DBHandler without any real protection in place
         self._db = db
-
+        self._cache = cache
         self._indexer_cls = indexer_cls
 
-        self._local_cache = xquery.cache.Cache_Memory()
+        # Currently several non-thread-safe resources are shared between the Main and DBHandler threads.
+        # Shared and protected by service_lock:
+        #   - self._db
+        #   - self._local_cache
+        # Shared and somewhat protected via queue.join():
+        #   - self._job_counter (read-only in DBHandler thread)
+        #   - self._result_counter (read-only in Main thread)
+        # Not currently shared:
+        #   - self._w3
+        #   - self._cache
+        self._service_lock = threading.RLock()
+        self._local_cache = Cache_Memory()
 
         self._queue_jobs_index = mp.JoinableQueue(maxsize=100)
         self._queue_jobs_process = mp.JoinableQueue(maxsize=100)
@@ -225,6 +238,9 @@ class Controller(object):
             w.start()
         for w in self._workers_process:
             w.start()
+        for w in [*self._workers_index, *self._workers_process]:
+            w.started.wait(timeout=30)
+            assert w.started.is_set()
         self._state = ControllerState.RUNNING
 
     def stop(self) -> None:
@@ -276,36 +292,38 @@ class Controller(object):
 
     def _get_state(self, name: str) -> orm.State:
         """
-        Get a state object
+        Get a state object (create a new state entry, if it doesn't exist already).
 
-        Create a new state entry, if it doesn't already exist.
+        Note: Uses a local cache that returns a reference to a state object (can be changed in any thread)
 
         :param name: state identifier
         :return:
         """
         log.debug(f"Getting state '{name}'")
 
-        key = f"_state_{name}"
-        state = self._local_cache.get(key)
+        with self._service_lock:
+            key = f"_state_{name}"
+            state = self._local_cache.get(key)
 
-        if not state:
-            with self._db.session() as session:
-                state = session.execute(
-                    select(orm.State)
-                        .filter(orm.State.name == name)
-                ).scalar()
+            if not state:
+                with self._db.session() as session:
+                    state = session.execute(
+                        select(orm.State)
+                            .filter(orm.State.name == name)
+                    ).scalar()
 
-                if state is None:
-                    state = orm.State(
-                        name=name,
-                        block_number=None,
-                        block_hash=None,
-                    )
+                    if state is None:
+                        state = orm.State(
+                            name=name,
+                            block_number=None,
+                            block_hash=None,
+                            finalized=None,
+                        )
 
-                    session.add(state)
-                    session.commit()
+                        session.add(state)
+                        session.commit()
 
-            self._local_cache.set(key, state)
+                self._local_cache.set(key, state)
 
         # ensure only persistent/detached objects get loaded from the cache
         assert state.id is not None
@@ -328,7 +346,7 @@ class Controller(object):
         :param job_result: job result that should be added to the database
         :return:
         """
-        with self._db.session() as session:
+        with self._service_lock, self._db.session() as session:
             for i, bundle in enumerate(job_result.data):
                 # Note: Only need to update the state once (last element) as we can assume that objects are sorted
                 #       and that all objects from a block are always bundled together in a single job result.
@@ -338,10 +356,6 @@ class Controller(object):
                     state.block_number = int(bundle.meta["block_number"])
                     state.block_hash = bundle.meta["block_hash"]
                     session.merge(state, load=True)
-
-                    # update cached state
-                    key = f"_state_{name}"
-                    self._local_cache.set(key, state)
 
                 for result in bundle.objects:
                     for obj in result:
@@ -558,7 +572,8 @@ class Controller(object):
             result = JobResult(id=self._job_counter, type=JobType.Index, data=[])
             self._job_counter += 1
 
-            objects = self._indexer_cls.setup(self._w3, self._db, start_block)
+            with self._service_lock:
+                objects = self._indexer_cls.setup(self._w3, self._db, start_block)
 
             result.data.append(
                 DataBundle(
@@ -581,8 +596,7 @@ class Controller(object):
             self._queue_results.join()
             assert self._job_counter == self._result_counter
 
-            # reload state
-            state_indexer = self._get_state(state_name)
+            # ensure state has been updated in the DBHandler
             assert state_indexer.block_number is not None
 
         start_block = max(start_block, state_indexer.block_number + 1)
@@ -615,6 +629,7 @@ class Controller(object):
                         from_block=current_block,
                         chunk_size=current_chunk_size,
                     )
+                    break
                 except (HTTPError, Timeout):
                     if i < retries - 1:
                         current_chunk_size = max(1, current_chunk_size // 2)
@@ -726,7 +741,8 @@ class Controller(object):
                 result = JobResult(id=self._job_counter, type=JobType.Process, data=[])
                 self._job_counter += 1
 
-                objects = stage.cls.setup(self._db, start_block)
+                with self._service_lock:
+                    objects = stage.cls.setup(self._db, start_block)
 
                 result.data.append(
                     DataBundle(
@@ -749,21 +765,24 @@ class Controller(object):
                 self._queue_results.join()
                 assert self._job_counter == self._result_counter
 
-                # reload state
-                state_processor = self._get_state(state_name)
+                # ensure state has been updated in the DBHandler
                 assert state_processor.block_number is not None
 
-            adjust_start_block = max(start_block, state_processor.block_number + 1)
+            adjusted_start_block = max(start_block, state_processor.block_number + 1)
 
             # we are already done
-            if adjust_start_block > end_block:
-                log.info(f"Skipping up-to-date stage '{stage.name}' ({adjust_start_block} to {end_block})")
+            # fixme: finalization might not be computed, if we skip processing here
+            if adjusted_start_block > end_block:
+                log.info(f"Skipping up-to-date stage '{stage.name}' ({adjusted_start_block} to {end_block})")
                 continue
 
-            log.info(f"Processing stage '{stage.name}' ({adjust_start_block} to {end_block})")
+            log.info(f"Preparing stage '{stage.name}' ({adjusted_start_block} to {end_block})")
+            with self._service_lock:
+                stage.cls.pre_process(self._db, self._cache, adjusted_start_block, end_block)
 
-            batch_size = stage.batch_size if stage.batch_size else (end_block - adjust_start_block + 1)
-            for a, b in intervaled(adjust_start_block, end_block, batch_size):
+            log.info(f"Processing stage '{stage.name}' ({adjusted_start_block} to {end_block})")
+            batch_size = stage.batch_size if stage.batch_size else (end_block - adjusted_start_block + 1)
+            for a, b in intervaled(adjusted_start_block, end_block, batch_size):
                 if self._terminating_local.is_set():
                     break
 
@@ -790,6 +809,13 @@ class Controller(object):
             self._queue_jobs_process.join()
             self._queue_results.join()
             assert self._job_counter == self._result_counter
+
+            if self._terminating_local.is_set():
+                break
+
+            log.info(f"Finalizing stage '{stage.name}' ({start_block} to {end_block})")
+            with self._service_lock:
+                stage.cls.post_process(self._db, self._cache, start_block, end_block, state_processor)
 
         # wait (blocking) for all jobs to be picked up by a processor worker
         self._queue_jobs_process.join()
@@ -850,6 +876,3 @@ class Controller(object):
                 if delay > 0:
                     log.info(f"Resuming main loop in {delay:.2f}s")
                     self._terminating_local.wait(delay)
-
-            # FIXME: workaround to give all worker processes enough time to fully initialize in the case of a short scan
-            time.sleep(5.0)

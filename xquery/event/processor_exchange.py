@@ -20,6 +20,10 @@ from .processor_exchange_count import (
     EventProcessorStageExchangePangolin_Count,
     EventProcessorStageExchangePegasys_Count,
 )
+from .processor_exchange_stats import (
+    EventProcessorStageExchangePangolin_Stats,
+    EventProcessorStageExchangePegasys_Stats,
+)
 
 
 class EventProcessorExchange(EventProcessor):
@@ -42,6 +46,7 @@ class EventProcessorExchangePangolin(EventProcessorExchange):
         super().__init__(
             stages=[
                 StageInfo("bundle", EventProcessorStageExchangePangolin_Bundle, 1024 * 20),
+                StageInfo("stats", EventProcessorStageExchangePangolin_Stats, 1024 * 5),
                 StageInfo("count", EventProcessorStageExchangePangolin_Count, None),
             ],
         )
@@ -56,6 +61,7 @@ class EventProcessorExchangePegasys(EventProcessorExchange):
         super().__init__(
             stages=[
                 StageInfo("bundle", EventProcessorStageExchangePegasys_Bundle, 1024 * 10),
+                StageInfo("stats", EventProcessorStageExchangePegasys_Stats, 1024 * 2),
                 StageInfo("count", EventProcessorStageExchangePegasys_Count, None),
             ],
         )

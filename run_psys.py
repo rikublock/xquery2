@@ -106,7 +106,7 @@ def main() -> int:
     # Note: the actual processor stages will be instantiated in the worker process
     event_processor = EventProcessorExchangePegasys()
 
-    with xquery.controller.Controller(w3=w3, db=db, indexer_cls=indexer_cls, num_workers=int(C["XQ_NUM_WORKERS"])) as c:
+    with xquery.controller.Controller(w3=w3, db=db, cache=cache, indexer_cls=indexer_cls, num_workers=int(C["XQ_NUM_WORKERS"])) as c:
         c.run(
             start_block=psys_factory.from_block,
             end_block="latest",
@@ -114,7 +114,7 @@ def main() -> int:
             filter_=event_filter,
             processor=event_processor,
             chunk_size=2048,
-            target_sleep_time=300,
+            target_sleep_time=60,
         )
 
     return 0

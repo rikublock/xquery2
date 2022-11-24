@@ -29,11 +29,11 @@ class Cache_Memory(Cache):
     def set(self, name: TKey, value: TValue, ttl: Optional[int] = None) -> Any:
         self._cache[name] = value
 
-    def get(self, name: TKey) -> Any:
+    def get(self, name: TKey, default: Any = None) -> Any:
         try:
             return self._cache[name]
         except KeyError:
-            return None
+            return default
 
     def remove(self, name: TKey) -> Any:
         try:

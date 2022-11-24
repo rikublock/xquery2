@@ -42,7 +42,8 @@ class WorkerBase(mp.Process):
         self.queue_jobs = queue_jobs
         self.queue_results = queue_results
         self.terminating = terminating
-        self.terminating_local = threading.Event()
+        self.terminating_local = None
+        self.started = mp.Event()
 
         self.db = None
         self.cache = None
@@ -56,6 +57,8 @@ class WorkerBase(mp.Process):
         # rename process MainThread
         thread = threading.current_thread()
         thread.name = mp.current_process().name
+
+        self.terminating_local = threading.Event()
 
         # handle OS signals
         def _signal_handler(signum, frame):
@@ -96,6 +99,8 @@ class WorkerBase(mp.Process):
             raise
 
         init_decimal_context()
+
+        self.started.set()
 
     def run(self) -> None:
         """

@@ -27,3 +27,4 @@ class State(BaseModel, Base):
     name = Column(String(length=128), unique=True, nullable=False)
     block_number = Column(Integer)
     block_hash = Column(String(length=66))
+    finalized = Column(Integer)

@@ -19,9 +19,9 @@ import logging
 
 from dataclasses import dataclass
 
-import xquery.cache
-import xquery.db
 import xquery.db.orm as orm
+from xquery.cache import Cache
+from xquery.db import FusionSQL
 
 log = logging.getLogger(__name__)
 
@@ -33,13 +33,13 @@ class EventProcessorStage(abc.ABC):
     Responsible for:
     - post-process previously indexed event data already present in the database
     - compute and aggregate complex data from database entries
-    - prepare/update database orm objects (without committing)
+    - prepare/update database orm objects
 
     Note: This runs in a worker process.
     Note: Worker processes primarily have read access to the database, but may commit very distinct/specific data.
     """
 
-    def __init__(self, db: xquery.db.FusionSQL, cache: xquery.cache.Cache) -> None:
+    def __init__(self, db: FusionSQL, cache: Cache) -> None:
         """
         Create event processor stage
 
@@ -51,20 +51,42 @@ class EventProcessorStage(abc.ABC):
 
     @classmethod
     @abc.abstractmethod
-    def setup(cls, db: xquery.db.FusionSQL, start_block: int) -> Union[List[orm.Base], List[Tuple[Type[orm.Base], List[dict]]]]:
+    def setup(cls, db: FusionSQL, first_block: int) -> Union[List[orm.Base], List[Tuple[Type[orm.Base], List[dict]]]]:
+        """
+        One-time setup/configuration of a stage
+
+        Subclasses are expected to:
+        - perform any initial stage configuration
+
+        Note: Runs on the main thread (main process)
+        Note: Should be called exactly once before first running a stage
+
+        :param db: database service
+        :param first_block: the earliest block this stage will ever process
+        :return:
+        """
+        raise NotImplementedError
+
+    @classmethod
+    def pre_process(cls, db: FusionSQL, cache: Cache, start_block: int, end_block: int) -> None:
         """
         Initialize the stage before workers start processing data
 
         Subclasses are expected to:
-        - perform global initializations
+        - perform any global stage initializations
+        - prepare global cache
 
-        Note: Should only be called once from the main thread
+        Note: Runs on the main thread (main process)
+        Note: Should be called exactly once per run before processing compute intervals
+        Note: Should not make any changes to the database (read only)
 
         :param db: database service
-        :param start_block: the earliest block this stage will ever process
+        :param cache: cache service
+        :param start_block: first block (start of interval)
+        :param end_block: last block (included in the computation)
         :return:
         """
-        raise NotImplementedError
+        pass
 
     @abc.abstractmethod
     def process(self, start_block: int, end_block: int) -> Union[List[orm.Base], List[Tuple[Type[orm.Base], List[dict]]]]:
@@ -76,11 +98,41 @@ class EventProcessorStage(abc.ABC):
         - load and filter orm objects from the database required for the computation
         - return a list of new/updated database orm objects
 
+        Note: Runs in a worker process
+
         :param start_block: first block (start of interval)
         :param end_block: last block (included in the computation)
         :return:
         """
         raise NotImplementedError
+
+    @classmethod
+    def post_process(cls, db: FusionSQL, cache: Cache, first_block: int, end_block: int, state: orm.State) -> None:
+        """
+        Finalize the stage after all workers have completed processing data
+
+        Subclasses are expected to:
+        - do any sequential bulk orm updates (bypass DBHandler)
+        - perform any global stage finalizations
+        - update the stage ``finalized`` field
+
+        Note: Runs on the main thread (main process)
+        Note: Should be called exactly once per run after processing compute intervals
+        Note: Can adjust the ``first_block`` internally depending on the state
+
+        :param db: database service
+        :param cache: cache service
+        :param first_block: the earliest block this stage will ever process
+        :param end_block: last block (included in the computation)
+        :param state: database state associated with this stage
+        :return:
+        """
+        with db.session() as session:
+            state.finalized = end_block
+            assert state.block_number >= state.finalized
+
+            session.merge(state, load=True)
+            session.commit()
 
 
 class EventProcessorStageDummy(EventProcessorStage):
@@ -92,7 +144,7 @@ class EventProcessorStageDummy(EventProcessorStage):
         pass
 
     @classmethod
-    def setup(cls, db: xquery.db.FusionSQL, start_block: int) -> Union[List[orm.Base], List[Tuple[Type[orm.Base], List[dict]]]]:
+    def setup(cls, db: FusionSQL, first_block: int) -> Union[List[orm.Base], List[Tuple[Type[orm.Base], List[dict]]]]:
         return []
 
     def process(self, start_block: int, end_block: int) -> Union[List[orm.Base], List[Tuple[Type[orm.Base], List[dict]]]]:

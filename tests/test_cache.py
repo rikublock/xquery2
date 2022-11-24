@@ -44,3 +44,13 @@ def test_cache(c: xquery.cache.Cache) -> None:
     assert c.get(key) == value
     time.sleep(3.0)
     assert c.get(key) is None
+
+    # default value
+    assert c.get("_wrong_key") is None
+    assert c.get("_wrong_key", [1, 2, 3]) == [1, 2, 3]
+
+    # flush
+    c.set(key, value)
+    assert c.get(key) == value
+    c.flush()
+    assert c.get(key) is None

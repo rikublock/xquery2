@@ -6,6 +6,13 @@
 #
 # This file is part of XQuery2.
 
+from typing import (
+    List,
+    Tuple,
+    Type,
+    Union,
+)
+
 import datetime
 
 from sqlalchemy import (
@@ -24,6 +31,8 @@ Base = declarative_base(
         schema=C["DB_SCHEMA"],
     ),
 )
+
+TDBObjs = Union[List[Base], List[Tuple[Type[Base], List[dict]]]]
 
 
 class BaseModel(object):

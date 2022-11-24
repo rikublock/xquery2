@@ -43,11 +43,12 @@ class Cache(abc.ABC):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def get(self, name: TKey) -> Any:
+    def get(self, name: TKey, default: Any = None) -> Any:
         """
-        Return the value at key ``name``, or None if the key doesn't exist
+        Return the value at key ``name``, or ``default = None`` if the key doesn't exist
 
         :param name: key
+        :param default: default value
         :return:
         """
         raise NotImplementedError

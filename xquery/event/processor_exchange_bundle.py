@@ -76,7 +76,7 @@ class EventProcessorStageExchange_Bundle(EventProcessorStage):
         loading the first price at position <= (block, logIndex).
 
         Computes the following data:
-          - bundle table
+          - table bundle
 
         Depends on:
           - None
@@ -268,7 +268,7 @@ class EventProcessorStageExchange_Bundle(EventProcessorStage):
             return objects
 
     @classmethod
-    def setup(cls, db: xquery.db.FusionSQL, start_block: int) -> Union[List[orm.Base], List[Tuple[Type[orm.Base], List[dict]]]]:
+    def setup(cls, db: xquery.db.FusionSQL, first_block: int) -> Union[List[orm.Base], List[Tuple[Type[orm.Base], List[dict]]]]:
         return []
 
     def process(self, start_block: int, end_block: int) -> Union[List[orm.Base], List[Tuple[Type[orm.Base], List[dict]]]]:

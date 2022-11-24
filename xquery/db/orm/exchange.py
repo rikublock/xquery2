@@ -39,15 +39,15 @@ class Factory(BaseModel, Base):
     pairCount = Column(Integer, nullable=False)
 
     # total volume
-    totalVolumeUSD = Column(Numeric(precision=78, scale=0), nullable=False)
-    totalVolumeNative = Column(Numeric(precision=78, scale=0), nullable=False)
+    totalVolumeUSD = Column(Numeric(precision=78, scale=18), nullable=False)
+    totalVolumeNative = Column(Numeric(precision=78, scale=18), nullable=False)
 
     # untracked values - less confident USD scores
-    untrackedVolumeUSD = Column(Numeric(precision=78, scale=0), nullable=False)
+    untrackedVolumeUSD = Column(Numeric(precision=78, scale=18), nullable=False)
 
     # total liquidity
-    totalLiquidityUSD = Column(Numeric(precision=78, scale=0), nullable=False)
-    totalLiquidityNative = Column(Numeric(precision=78, scale=0), nullable=False)
+    totalLiquidityUSD = Column(Numeric(precision=78, scale=18), nullable=False)
+    totalLiquidityNative = Column(Numeric(precision=78, scale=18), nullable=False)
 
     # transactions
     txCount = Column(Integer, nullable=False)
@@ -73,24 +73,22 @@ class Token(BaseModel, Base):
     totalSupply = Column(Numeric(precision=78, scale=0), nullable=False)
 
     # token specific volume
-    tradeVolume = Column(Numeric(precision=78, scale=0), nullable=False)
-    tradeVolumeUSD = Column(Numeric(precision=78, scale=0), nullable=False)
-    untrackedVolumeUSD = Column(Numeric(precision=78, scale=0), nullable=False)
+    tradeVolume = Column(Numeric(precision=78, scale=18), nullable=False)
+    tradeVolumeUSD = Column(Numeric(precision=78, scale=18), nullable=False)
+    untrackedVolumeUSD = Column(Numeric(precision=78, scale=18), nullable=False)
 
     # transactions across all pairs
     txCount = Column(Integer, nullable=False)
 
     # liquidity across all pairs
-    totalLiquidity = Column(Numeric(precision=78, scale=0), nullable=False)
+    totalLiquidity = Column(Numeric(precision=78, scale=18), nullable=False)
 
     # derived prices
-    derivedNative = Column(Numeric(precision=78, scale=0))
+    derivedNative = Column(Numeric(precision=78, scale=18))
 
     # Relationships to other tables
-    # derived fields
+    tokenHourData = relationship("TokenHourData", back_populates="token")
     tokenDayData = relationship("TokenDayData", back_populates="token")
-    pairDayDataBase = relationship("PairDayData", back_populates="token0", foreign_keys="PairDayData.token0_id")
-    pairDayDataQuote = relationship("PairDayData", back_populates="token1", foreign_keys="PairDayData.token1_id")
     pairBase = relationship("Pair", back_populates="token0", foreign_keys="Pair.token0_address")
     pairQuote = relationship("Pair", back_populates="token1", foreign_keys="Pair.token1_address")
 
@@ -119,25 +117,25 @@ class Pair(BaseModel, Base):
     UniqueConstraint(token0_address, token1_address)
     CheckConstraint(token0_address != token1_address, name="pair_unequal_token_address")
 
-    reserve0 = Column(Numeric(precision=78, scale=0), nullable=False)
-    reserve1 = Column(Numeric(precision=78, scale=0), nullable=False)
-    totalSupply = Column(Numeric(precision=78, scale=0), nullable=False)
+    reserve0 = Column(Numeric(precision=78, scale=18), nullable=False)
+    reserve1 = Column(Numeric(precision=78, scale=18), nullable=False)
+    totalSupply = Column(Numeric(precision=78, scale=18), nullable=False)
 
     # derived liquidity
-    reserveNative = Column(Numeric(precision=78, scale=0), nullable=False)
-    reserveUSD = Column(Numeric(precision=78, scale=0), nullable=False)
+    reserveNative = Column(Numeric(precision=78, scale=18), nullable=False)
+    reserveUSD = Column(Numeric(precision=78, scale=18), nullable=False)
     # used for separating per pair reserves and global
-    trackedReserveNative = Column(Numeric(precision=78, scale=0), nullable=False)
+    trackedReserveNative = Column(Numeric(precision=78, scale=18), nullable=False)
 
     # Price in terms of the asset pair
-    token0Price = Column(Numeric(precision=78, scale=0), nullable=False)
-    token1Price = Column(Numeric(precision=78, scale=0), nullable=False)
+    token0Price = Column(Numeric(precision=78, scale=18), nullable=False)
+    token1Price = Column(Numeric(precision=78, scale=18), nullable=False)
 
     # lifetime volume stats
-    volumeToken0 = Column(Numeric(precision=78, scale=0), nullable=False)
-    volumeToken1 = Column(Numeric(precision=78, scale=0), nullable=False)
-    volumeUSD = Column(Numeric(precision=78, scale=0), nullable=False)
-    untrackedVolumeUSD = Column(Numeric(precision=78, scale=0), nullable=False)
+    volumeToken0 = Column(Numeric(precision=78, scale=18), nullable=False)
+    volumeToken1 = Column(Numeric(precision=78, scale=18), nullable=False)
+    volumeUSD = Column(Numeric(precision=78, scale=18), nullable=False)
+    untrackedVolumeUSD = Column(Numeric(precision=78, scale=18), nullable=False)
     txCount = Column(Integer, nullable=False)
 
     # legacy
@@ -154,6 +152,7 @@ class Pair(BaseModel, Base):
 
     # derived fields
     pairHourData = relationship("PairHourData", back_populates="pair")
+    pairDayData = relationship("PairDayData", back_populates="pair")
     liquidityPositions = relationship("LiquidityPosition", back_populates="pair")
     liquidityPositionSnapshots = relationship("LiquidityPositionSnapshot", back_populates="pair")
     mints = relationship("Mint", back_populates="pair")
@@ -175,7 +174,7 @@ class User(BaseModel, Base):
     liquidityPositions = relationship("LiquidityPosition", back_populates="user")
     liquidityPositionSnapshots = relationship("LiquidityPositionSnapshot", back_populates="user")
 
-    usdSwapped = Column(Numeric(precision=78, scale=0), nullable=False)
+    usdSwapped = Column(Numeric(precision=78, scale=18), nullable=False)
 
 
 class LiquidityPosition(BaseModel, Base):
@@ -192,7 +191,7 @@ class LiquidityPosition(BaseModel, Base):
     pair_address = Column(String(length=42), ForeignKey("pair.address"))
     pair = relationship("Pair", back_populates="liquidityPositions", foreign_keys=[pair_address])
 
-    liquidityTokenBalance = Column(Numeric(precision=78, scale=0), nullable=False)
+    liquidityTokenBalance = Column(Numeric(precision=78, scale=18), nullable=False)
 
     UniqueConstraint(user_id, pair_address)
 
@@ -225,13 +224,13 @@ class LiquidityPositionSnapshot(BaseModel, Base):
     pair = relationship("Pair", back_populates="liquidityPositionSnapshots", foreign_keys=[pair_address])
 
     # snapshot
-    token0PriceUSD = Column(Numeric(precision=78, scale=0), nullable=False) # snapshot of token0 price
-    token1PriceUSD = Column(Numeric(precision=78, scale=0), nullable=False) # snapshot of token1 price
-    reserve0 = Column(Numeric(precision=78, scale=0), nullable=False) # snapshot of pair token0 reserves
-    reserve1 = Column(Numeric(precision=78, scale=0), nullable=False) # snapshot of pair token1 reserves
-    reserveUSD = Column(Numeric(precision=78, scale=0), nullable=False) # snapshot of pair reserves in USD
-    liquidityTokenTotalSupply = Column(Numeric(precision=78, scale=0), nullable=False) # snapshot of pool token supply
-    liquidityTokenBalance = Column(Numeric(precision=78, scale=0), nullable=False) # snapshot of users pool token balance
+    token0PriceUSD = Column(Numeric(precision=78, scale=18), nullable=False)
+    token1PriceUSD = Column(Numeric(precision=78, scale=18), nullable=False)
+    reserve0 = Column(Numeric(precision=78, scale=18), nullable=False)
+    reserve1 = Column(Numeric(precision=78, scale=18), nullable=False)
+    reserveUSD = Column(Numeric(precision=78, scale=18), nullable=False)
+    liquidityTokenTotalSupply = Column(Numeric(precision=78, scale=18), nullable=False)
+    liquidityTokenBalance = Column(Numeric(precision=78, scale=18), nullable=False)
 
 
 class Block(BaseModel, Base):
@@ -449,15 +448,15 @@ class ExchangeDayData(BaseModel, Base):
     identifier = Column(Integer, nullable=False, unique=True)
     date = Column(Integer, nullable=False)
 
-    dailyVolumeNative = Column(Numeric(precision=78, scale=0), nullable=False)
-    dailyVolumeUSD = Column(Numeric(precision=78, scale=0), nullable=False)
-    dailyVolumeUntracked = Column(Numeric(precision=78, scale=0), nullable=False)
+    dailyVolumeNative = Column(Numeric(precision=78, scale=18), nullable=False)
+    dailyVolumeUSD = Column(Numeric(precision=78, scale=18), nullable=False)
+    dailyVolumeUntracked = Column(Numeric(precision=78, scale=18), nullable=False)
 
-    totalVolumeNative = Column(Numeric(precision=78, scale=0), nullable=False)
-    totalLiquidityNative = Column(Numeric(precision=78, scale=0), nullable=False)
+    totalVolumeNative = Column(Numeric(precision=78, scale=18), nullable=False)
+    totalLiquidityNative = Column(Numeric(precision=78, scale=18), nullable=False)
     # Accumulate at each trade, not just calculated off whatever totalVolume is. making it more accurate as it is a live conversion
-    totalVolumeUSD = Column(Numeric(precision=78, scale=0), nullable=False)
-    totalLiquidityUSD = Column(Numeric(precision=78, scale=0), nullable=False)
+    totalVolumeUSD = Column(Numeric(precision=78, scale=18), nullable=False)
+    totalLiquidityUSD = Column(Numeric(precision=78, scale=18), nullable=False)
 
     txCount = Column(Integer, nullable=False)
 
@@ -471,25 +470,28 @@ class PairHourData(BaseModel, Base):
     __tablename__ = "pair_hour_data"
 
     # unix timestamp for start of hour
+    hourIndex = Column(Integer, nullable=False)
     hourStartUnix = Column(Integer, nullable=False)
+    CheckConstraint(hourStartUnix == hourIndex * 3600)
 
     pair_address = Column(String(length=42), ForeignKey("pair.address"))
     pair = relationship("Pair", back_populates="pairHourData", foreign_keys=[pair_address])
 
     # reserves
-    reserve0 = Column(Numeric(precision=78, scale=0), nullable=False)
-    reserve1 = Column(Numeric(precision=78, scale=0), nullable=False)
-
-    # total supply for LP historical returns
-    totalSupply = Column(Numeric(precision=78, scale=0), nullable=False)
+    reserve0 = Column(Numeric(precision=78, scale=18), nullable=False)
+    reserve1 = Column(Numeric(precision=78, scale=18), nullable=False)
 
     # derived liquidity
-    reserveUSD = Column(Numeric(precision=78, scale=0), nullable=False)
+    reserveUSD = Column(Numeric(precision=78, scale=18), nullable=False)
+
+    # total supply for LP historical returns
+    totalSupply = Column(Numeric(precision=78, scale=18))
+    totalSupplyChange = Column(Numeric(precision=78, scale=18), nullable=False)
 
     # volume stats
-    hourlyVolumeToken0 = Column(Numeric(precision=78, scale=0), nullable=False)
-    hourlyVolumeToken1 = Column(Numeric(precision=78, scale=0), nullable=False)
-    hourlyVolumeUSD = Column(Numeric(precision=78, scale=0), nullable=False)
+    hourlyVolumeToken0 = Column(Numeric(precision=78, scale=18), nullable=False)
+    hourlyVolumeToken1 = Column(Numeric(precision=78, scale=18), nullable=False)
+    hourlyVolumeUSD = Column(Numeric(precision=78, scale=18), nullable=False)
     hourlyTxns = Column(Integer, nullable=False)
 
 
@@ -501,30 +503,61 @@ class PairDayData(BaseModel, Base):
     """
     __tablename__ = "pair_day_data"
 
-    date = Column(Integer, nullable=False)
-    pairAddress = Column(String(length=42), nullable=False)  # TODO use relationship ?
+    # unix timestamp for start of day
+    dayIndex = Column(Integer, nullable=False)
+    dayStartUnix = Column(Integer, nullable=False)
+    CheckConstraint(dayStartUnix == dayIndex * 86400)
 
-    token0_id = Column(Integer, ForeignKey("token.id"))
-    token0 = relationship("Token", back_populates="pairDayDataBase", foreign_keys=[token0_id])
-
-    token1_id = Column(Integer, ForeignKey("token.id"))
-    token1 = relationship("Token", back_populates="pairDayDataQuote", foreign_keys=[token1_id])
+    pair_address = Column(String(length=42), ForeignKey("pair.address"))
+    pair = relationship("Pair", back_populates="pairDayData", foreign_keys=[pair_address])
 
     # reserves
-    reserve0 = Column(Numeric(precision=78, scale=0), nullable=False)
-    reserve1 = Column(Numeric(precision=78, scale=0), nullable=False)
-
-    # total supply for LP historical returns
-    totalSupply = Column(Numeric(precision=78, scale=0), nullable=False)
+    reserve0 = Column(Numeric(precision=78, scale=18), nullable=False)
+    reserve1 = Column(Numeric(precision=78, scale=18), nullable=False)
 
     # derived liquidity
-    reserveUSD = Column(Numeric(precision=78, scale=0), nullable=False)
+    reserveUSD = Column(Numeric(precision=78, scale=18), nullable=False)
+
+    # total supply for LP historical returns
+    totalSupply = Column(Numeric(precision=78, scale=18), nullable=False)
 
     # volume stats
-    dailyVolumeToken0 = Column(Numeric(precision=78, scale=0), nullable=False)
-    dailyVolumeToken1 = Column(Numeric(precision=78, scale=0), nullable=False)
-    dailyVolumeUSD = Column(Numeric(precision=78, scale=0), nullable=False)
+    dailyVolumeToken0 = Column(Numeric(precision=78, scale=18), nullable=False)
+    dailyVolumeToken1 = Column(Numeric(precision=78, scale=18), nullable=False)
+    dailyVolumeUSD = Column(Numeric(precision=78, scale=18), nullable=False)
     dailyTxns = Column(Integer, nullable=False)
+
+
+class TokenHourData(BaseModel, Base):
+    """
+    Data accumulated and condensed into hourly stats for each token.
+
+    Relationships
+    """
+    __tablename__ = "token_hour_data"
+
+    # unix timestamp for start of hour
+    hourIndex = Column(Integer, nullable=False)
+    hourStartUnix = Column(Integer, nullable=False)
+    CheckConstraint(hourStartUnix == hourIndex * 3600)
+
+    token_address = Column(String(length=42), ForeignKey("token.address"))
+    token = relationship("Token", back_populates="tokenHourData", foreign_keys=[token_address])
+
+    # volume stats
+    hourlyVolumeToken = Column(Numeric(precision=78, scale=18), nullable=False)
+    hourlyVolumeNative = Column(Numeric(precision=78, scale=18), nullable=False)
+    hourlyVolumeUSD = Column(Numeric(precision=78, scale=18), nullable=False)
+    hourlyTxns = Column(Integer, nullable=False)
+
+    # liquidity stats
+    totalLiquidityToken = Column(Numeric(precision=78, scale=18))
+    totalLiquidityTokenChange = Column(Numeric(precision=78, scale=18), nullable=False)
+    totalLiquidityNative = Column(Numeric(precision=78, scale=18))
+    totalLiquidityUSD = Column(Numeric(precision=78, scale=18))
+
+    # price stats
+    priceUSD = Column(Numeric(precision=78, scale=18), nullable=False)
 
 
 class TokenDayData(BaseModel, Base):
@@ -535,21 +568,24 @@ class TokenDayData(BaseModel, Base):
     """
     __tablename__ = "token_day_data"
 
-    date = Column(Integer, nullable=False)
+    # unix timestamp for start of day
+    dayIndex = Column(Integer, nullable=False)
+    dayStartUnix = Column(Integer, nullable=False)
+    CheckConstraint(dayStartUnix == dayIndex * 86400)
 
-    token_id = Column(Integer, ForeignKey("token.id"))
-    token = relationship("Token", back_populates="tokenDayData", foreign_keys=[token_id])
+    token_address = Column(String(length=42), ForeignKey("token.address"))
+    token = relationship("Token", back_populates="tokenDayData", foreign_keys=[token_address])
 
     # volume stats
-    dailyVolumeToken = Column(Numeric(precision=78, scale=0), nullable=False)
-    dailyVolumeNative = Column(Numeric(precision=78, scale=0), nullable=False)
-    dailyVolumeUSD = Column(Numeric(precision=78, scale=0), nullable=False)
+    dailyVolumeToken = Column(Numeric(precision=78, scale=18), nullable=False)
+    dailyVolumeNative = Column(Numeric(precision=78, scale=18), nullable=False)
+    dailyVolumeUSD = Column(Numeric(precision=78, scale=18), nullable=False)
     dailyTxns = Column(Integer, nullable=False)
 
     # liquidity stats
-    totalLiquidityToken = Column(Numeric(precision=78, scale=0), nullable=False)
-    totalLiquidityNative = Column(Numeric(precision=78, scale=0), nullable=False)
-    totalLiquidityUSD = Column(Numeric(precision=78, scale=0), nullable=False)
+    totalLiquidityToken = Column(Numeric(precision=78, scale=18), nullable=False)
+    totalLiquidityNative = Column(Numeric(precision=78, scale=18), nullable=False)
+    totalLiquidityUSD = Column(Numeric(precision=78, scale=18), nullable=False)
 
     # price stats
-    priceUSD = Column(Numeric(precision=78, scale=0), nullable=False)
+    priceUSD = Column(Numeric(precision=78, scale=18), nullable=False)
